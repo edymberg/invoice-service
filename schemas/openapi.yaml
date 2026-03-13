@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: ARCA Invoicing API
+  version: 1.0.0
+  description: >
+    APIs para emitir Factura C en ARCA (ex AFIP) usando Afip SDK.
+servers:
+  - url: http://localhost:3000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  headers:
+    X-Correlation-Id:
+      description: Correlation id para trazabilidad
+      schema: { type: string }
+  schemas:
+    CreateInvoiceRequest:
+      type: object
+      required: [monto, concept]
+      properties:
+        externalId: { type: string, description: "Idempotencia" }
+        monto: { type: number, minimum: 0.01 }
+        dni: { type: integer, minimum: 1000000, maximum: 99999999, nullable: true }
+        concept:
+          type: integer
+          enum: [1,2]
+        serviceFrom:
+          type: integer
+          description: Fecha desde (yyyymmdd). Requerido si concept=2
+        serviceTo:
+          type: integer
+          description: Fecha hasta (yyyymmdd). Requerido si concept=2
+        pointOfSale:
+          type: integer
+          description: "Punto de venta (parametrizado)"
+    CreateInvoiceResponse:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [Draft, Issuing, Issued, Failed] }
+        cae: { type: string, nullable: true }
+        caeVto: { type: string, nullable: true }
+        voucherNumber: { type: integer, nullable: true }
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      summary: Healthcheck
+      responses:
+        "200": { description: OK }
+
+  /invoices:
+    post:
+      summary: Emitir Factura C
+      description: Emite Factura C (CbteTipo=11), IVA 0. Si no se envía DNI, se usa Consumidor Final (DocTipo=99/DocNro=0).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateInvoiceRequest' }
+      responses:
+        "201":
+          description: Creada
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateInvoiceResponse' }
+        "400": { description: Error de validación }
+        "401": { description: Unauthorized }
+
+  /invoices/{id}:
+    get:
+      summary: Obtener factura
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: No encontrada
+
+  /invoices/{id}/pdf:
+    get:
+      summary: Descargar PDF (stub)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /afip/status:
+    get:
+      summary: Estado del servidor ARCA/AFIP
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { description: OK }
+
+  /sales-points:
+    get:
+      summary: Listar puntos de venta (stub)
+      description: TODO integrar FEParamGetPtosVenta vía SDK.
+      security:
+        - bearerAuth: []
+      responses:
+        "501": { description: Not Implemented }

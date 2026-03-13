@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from "express";
+
 import { env } from "../../../../config/env";
 import { logger } from "../../../../logging/logger";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers["authorization"];
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(401).json({ error: "Unauthorized" });
     } else {
@@ -16,7 +17,10 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
       next();
     }
   } catch (error) {
-    logger.error({ err: error, correlationId: (req as any).correlationId }, "Auth middleware error");
+    logger.error(
+      { err: error, correlationId: (req as any).correlationId },
+      "Auth middleware error",
+    );
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -1,3 +1,3 @@
 export interface MaskedDTO<I> {
-	mask(input: I): I;
+  mask(input: I): I;
 }

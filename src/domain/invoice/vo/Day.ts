@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+
 import { BusinessRuleViolation } from "../../../../framework/BusinessRuleViolation";
 
 export class DayDateBusinessRuleViolation extends BusinessRuleViolation {
@@ -11,29 +12,32 @@ interface DayDateBusinessRule {
   validate(date: DayDate): void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const positiveNumber = (value: any): boolean => {
   const negative = value <= 0;
   const infinite = !Number.isFinite(value);
   return !negative || !infinite || !Number.isNaN(value);
-}
+};
 
-class DayBusinessRules implements DayDateBusinessRule {  
+class DayBusinessRules implements DayDateBusinessRule {
   validate(date: DayDate): void {
-    if(!positiveNumber(date.day) || date.day > 31) {
+    if (!positiveNumber(date.day) || date.day > 31) {
       throw new DayDateBusinessRuleViolation(`Day must be a positive number, given: ${date.day}`);
     }
   }
 }
 
-class MonthBusinessRules implements DayDateBusinessRule {  
+class MonthBusinessRules implements DayDateBusinessRule {
   validate(date: DayDate): void {
     if (!positiveNumber(date.month) || date.month > 12) {
-      throw new DayDateBusinessRuleViolation(`Month must be a positive number between 1 and 12, given: ${date.month}`);
+      throw new DayDateBusinessRuleViolation(
+        `Month must be a positive number between 1 and 12, given: ${date.month}`,
+      );
     }
   }
 }
 
-class YearBusinessRules implements DayDateBusinessRule {  
+class YearBusinessRules implements DayDateBusinessRule {
   validate(date: DayDate): void {
     if (!positiveNumber(date.year)) {
       throw new DayDateBusinessRuleViolation(`Year must be a positive number, given: ${date.year}`);
@@ -42,29 +46,39 @@ class YearBusinessRules implements DayDateBusinessRule {
 }
 
 interface DayFactoryI {
-  build(): Day
-  month(month: number): DayFactoryI
-  year(year: number): DayFactoryI
-  day(day: number): DayFactoryI
+  build(): Day;
+  month(month: number): DayFactoryI;
+  year(year: number): DayFactoryI;
+  day(day: number): DayFactoryI;
 }
 
 export type DayDate = {
   day: number;
   month: number;
   year: number;
-}
+};
 
 // TODO: try to remove dayjs dependency
 
 export class Day {
-  private businessRules: DayDateBusinessRule[] = [new DayBusinessRules(), new MonthBusinessRules(), new YearBusinessRules()];
-  
+  private businessRules: DayDateBusinessRule[] = [
+    new DayBusinessRules(),
+    new MonthBusinessRules(),
+    new YearBusinessRules(),
+  ];
+
   public readonly numericDate: number;
   public readonly date: DayDate;
 
-  private constructor(date: DayDate) {  
-    this.businessRules.forEach(rule => rule.validate(date));
-    this.numericDate = Number(dayjs().date(date.day).month(date.month-1).year(date.year).format("YYYYMMDD"));
+  private constructor(date: DayDate) {
+    this.businessRules.forEach((rule) => rule.validate(date));
+    this.numericDate = Number(
+      dayjs()
+        .date(date.day)
+        .month(date.month - 1)
+        .year(date.year)
+        .format("YYYYMMDD"),
+    );
     this.date = date;
   }
 
@@ -91,7 +105,7 @@ export class Day {
       return Day._initialize(
         this.invoiceFieldsMap.day,
         this.invoiceFieldsMap.month,
-        this.invoiceFieldsMap.year
+        this.invoiceFieldsMap.year,
       );
     }
 
@@ -108,5 +122,5 @@ export class Day {
       this.invoiceFieldsMap.day = day;
       return this;
     }
-  } 
+  };
 }

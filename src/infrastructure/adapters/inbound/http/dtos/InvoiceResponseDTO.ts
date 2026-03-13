@@ -4,4 +4,4 @@ export type InvoiceResponseDTO = {
   cae: string | null;
   caeVto: string | null;
   voucherNumber: number | null;
-}
+};

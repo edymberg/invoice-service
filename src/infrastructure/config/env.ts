@@ -2,27 +2,35 @@ enum NodeEnvironment {
   LOCAL = "local",
   DEV = "dev",
   STG = "stg",
-  PROD = "prod"
-};
+  PROD = "prod",
+}
 function validateNodeEnv(env: string | undefined): NodeEnvironment {
   const defaultNodeEnv = NodeEnvironment.LOCAL;
-  if (!env) return defaultNodeEnv;
-  
+  if (!env) {
+    return defaultNodeEnv;
+  }
+
   const validEnvironments = Object.values(NodeEnvironment);
-  return validEnvironments.includes(env as NodeEnvironment) ? (env as NodeEnvironment) : defaultNodeEnv;
+  return validEnvironments.includes(env as NodeEnvironment)
+    ? (env as NodeEnvironment)
+    : defaultNodeEnv;
 }
 
 enum ArcaEnvironment {
   LOCAL = "local",
   DEV = "dev",
-  PROD = "prod"
-};
+  PROD = "prod",
+}
 function validateArcaEnv(env: string | undefined): ArcaEnvironment {
   const defaultArcaEnv = ArcaEnvironment.LOCAL;
-  if (!env) return defaultArcaEnv;
-  
+  if (!env) {
+    return defaultArcaEnv;
+  }
+
   const validEnvironments = Object.values(ArcaEnvironment);
-  return validEnvironments.includes(env as ArcaEnvironment) ? (env as ArcaEnvironment) : defaultArcaEnv;
+  return validEnvironments.includes(env as ArcaEnvironment)
+    ? (env as ArcaEnvironment)
+    : defaultArcaEnv;
 }
 
 export enum LogLevel {
@@ -31,12 +39,14 @@ export enum LogLevel {
   INFO = "info",
   WARN = "warn",
   ERROR = "error",
-  FATAL = "fatal"
+  FATAL = "fatal",
 }
 function validateLogLevel(level: string | undefined): LogLevel {
   const defaultLogLevel = LogLevel.INFO;
-  if (!level) return defaultLogLevel;
-  
+  if (!level) {
+    return defaultLogLevel;
+  }
+
   const validLevels = Object.values(LogLevel);
   return validLevels.includes(level as LogLevel) ? (level as LogLevel) : defaultLogLevel;
 }
@@ -44,7 +54,7 @@ function validateLogLevel(level: string | undefined): LogLevel {
 function parseInnerClassesLogLevels(): Record<string, LogLevel> {
   const innerClassesLevel: Record<string, LogLevel> = {};
   const prefix = "LOG_LEVEL_";
-  
+
   Object.keys(process.env).forEach((key) => {
     if (key.startsWith(prefix) && key !== "LOG_LEVEL") {
       const className = key
@@ -52,24 +62,24 @@ function parseInnerClassesLogLevels(): Record<string, LogLevel> {
         .split("_")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join("");
-      
+
       const logLevel = validateLogLevel(process.env[key]?.toLowerCase());
       innerClassesLevel[className] = logLevel;
     }
   });
-  
+
   return innerClassesLevel;
 }
 
 type LogConfig = {
   rootLevel: LogLevel;
   innerClassesLevel?: Record<string, LogLevel>;
-}
+};
 
 type EnvironmentVariables = {
   port: number;
   apiKey: string;
-  nodeEnv: NodeEnvironment
+  nodeEnv: NodeEnvironment;
   mongo: {
     uri: string;
     db: string;
@@ -97,10 +107,10 @@ export const env: EnvironmentVariables = {
     accessToken: process.env.ARCA_ACCESS_TOKEN ?? "",
     cuit: parseInt(process.env.ARCA_CUIT ?? "20409378472", 10),
     cert: process.env.ARCA_CERT ?? "",
-    key: process.env.ARCA_KEY ?? ""
+    key: process.env.ARCA_KEY ?? "",
   },
   log: {
     rootLevel: validateLogLevel(process.env.LOG_LEVEL),
-    innerClassesLevel: parseInnerClassesLogLevels()
-  }
+    innerClassesLevel: parseInnerClassesLogLevels(),
+  },
 };

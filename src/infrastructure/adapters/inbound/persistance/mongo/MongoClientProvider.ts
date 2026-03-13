@@ -1,4 +1,5 @@
 import { MongoClient, Db } from "mongodb";
+
 import { env } from "../../../../config/env";
 
 export class MongoClientProvider {
@@ -7,7 +8,9 @@ export class MongoClientProvider {
   private static db: Db;
 
   public static async getOrInitDataBase(): Promise<Db> {
-    if (this.db) return this.db;
+    if (this.db) {
+      return this.db;
+    }
 
     this.client = this.client || new MongoClient(env.mongo.uri);
     this.db = await this.connect();
@@ -20,6 +23,7 @@ export class MongoClientProvider {
       await this.client.connect();
       return this.client.db(env.mongo.db);
     } catch {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.client = null as any;
       throw new Error("MongoDB connection failed");
     }

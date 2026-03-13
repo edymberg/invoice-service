@@ -12,11 +12,11 @@ export type IssueInvoiceUseCaseInput = {
   serviceTo?: Day;
   pointOfSale?: number;
   idempotencyKey?: string;
-}
+};
 export type IssueInvoiceUseCaseOutput = {
-  invoice: Invoice
-}
+  invoice: Invoice;
+};
 
 export interface IssueInvoiceUseCase {
-  execute(input: IssueInvoiceUseCaseInput): Promise<IssueInvoiceUseCaseOutput>
+  execute(input: IssueInvoiceUseCaseInput): Promise<IssueInvoiceUseCaseOutput>;
 }

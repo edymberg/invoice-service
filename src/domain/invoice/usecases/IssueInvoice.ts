@@ -1,6 +1,6 @@
 import { Invoice } from "../Invoice";
 import { CONCEPT } from "../vo/Concept";
-import { DayDate } from "../vo/Day";
+import { Day } from "../vo/Day";
 import { Identification } from "../vo/Identification";
 
 export type IssueInvoiceUseCaseInput = {
@@ -8,8 +8,8 @@ export type IssueInvoiceUseCaseInput = {
   amount: number;
   idDocument: Identification;
   concept: CONCEPT;
-  serviceFrom?: DayDate;
-  serviceTo?: DayDate;
+  serviceFrom?: Day;
+  serviceTo?: Day;
   pointOfSale?: number;
   idempotencyKey?: string;
 }

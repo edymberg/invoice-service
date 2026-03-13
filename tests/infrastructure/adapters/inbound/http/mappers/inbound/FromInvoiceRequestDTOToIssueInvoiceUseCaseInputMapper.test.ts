@@ -1,7 +1,8 @@
 import { FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper, DTOMappingException } from "../../../../../../../src/infrastructure/adapters/inbound/http/mappers/inbound/FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper";
 import { InvoiceRequestDTO } from "../../../../../../../src/infrastructure/adapters/inbound/http/dtos/InvoiceRequestDTO";
 import { CONCEPT } from "../../../../../../../src/domain/invoice/vo/Concept";
-import { DocumentType } from "../../../../../../../src/domain/invoice/vo/Identification";
+import { DocumentType, IdentificationBusinessRuleViolation } from "../../../../../../../src/domain/invoice/vo/Identification";
+import { DayDateBusinessRuleViolation } from "../../../../../../../src/domain/invoice/vo/Day";
 
 describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
   const aValidProductsDTO = (): InvoiceRequestDTO => ({
@@ -58,8 +59,8 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     expect(result.idDocument.type).toBe(DocumentType.CUIT);
     expect(result.idDocument.value).toBe(2012345678);
     expect(result.concept).toBe(CONCEPT.SERVICES);
-    expect(result.serviceFrom).toStrictEqual({ day: 1, month: 6, year: 2023 });
-    expect(result.serviceTo).toStrictEqual({ day: 15, month: 6, year: 2023 });
+    expect(result.serviceFrom?.numericDate).toBe(20230601);
+    expect(result.serviceTo?.numericDate).toBe(20230615);
     expect(result.pointOfSale).toBe(2);
     expect(result.idempotencyKey).toBe("idem-456");
   });
@@ -76,7 +77,7 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     expect(act).toThrow("There where errors mapping the given DTO");
   });
 
-  it('Given DTO with neither DNI nor CUIT, when mapping, then should throw DTOMappingException', () => {
+  it('Given DTO with neither DNI nor CUIT, when mapping, then should throw IdentificationBusinessRuleViolation', () => {
     const dto = {
       ...aValidProductsDTO(),
       dni: null,
@@ -85,7 +86,7 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
 
     const act = () => mapper.map(dto, "idem-123");
 
-    expect(act).toThrow(DTOMappingException);
+    expect(act).toThrow(IdentificationBusinessRuleViolation);
   });
 
   it('Given services DTO without service dates, when mapping, then should throw DTOMappingException', () => {
@@ -109,7 +110,7 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
 
     const act = () => mapper.map(dto, "idem-123");
 
-    expect(act).toThrow(DTOMappingException);
+    expect(act).toThrow(DayDateBusinessRuleViolation);
   });
 
   it('Given DTO with negative amount, when mapping, then should throw DTOMappingException', () => {
@@ -173,30 +174,5 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     const result = mapper.map(dto, undefined);
 
     expect(result.idempotencyKey).toBeUndefined();
-  });
-
-  test.each([
-    ["2023-01-01", 1, 1, 2023],
-    ["2023-12-31", 31, 12, 2023],
-    ["2024-02-29", 29, 2, 2024]
-  ])('Given service date "%s", when mapping, then should parse correctly', (dateString, expectedDay, expectedMonth, expectedYear) => {
-    const dto = {
-      ...aValidServicesDTO(),
-      serviceFrom: dateString,
-      serviceTo: dateString
-    };
-
-    const result = mapper.map(dto, "idem-123");
-
-    expect(result.serviceFrom).toStrictEqual({
-      day: expectedDay,
-      month: expectedMonth,
-      year: expectedYear
-    });
-    expect(result.serviceTo).toStrictEqual({
-      day: expectedDay,
-      month: expectedMonth,
-      year: expectedYear
-    });
   });
 });

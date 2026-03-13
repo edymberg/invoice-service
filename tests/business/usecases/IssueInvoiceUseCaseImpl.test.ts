@@ -5,12 +5,13 @@ import { CONCEPT } from "../../../src/domain/invoice/vo/Concept";
 import { InvoiceStatus } from "../../../src/domain/invoice/vo/InvoiceStatus";
 import { VoucherType } from "../../../src/domain/invoice/vo/VoucherType";
 import { DocumentType, Identification } from "../../../src/domain/invoice/vo/Identification";
+import { Day } from "../../../src/domain/invoice/vo/Day";
 
 describe('IssueInvoiceUseCaseImpl', () => {
   const aValidInput = (): IssueInvoiceUseCaseInput => ({
     externalId: "external-123",
     amount: 1000,
-    idDocument: Identification.initialize(12345678, DocumentType.DNI),
+    idDocument: Identification.builder().type(DocumentType.DNI).value(12345678).build(),
     concept: CONCEPT.PRODUCTS,
     pointOfSale: 1,
     idempotencyKey: "idem-123"
@@ -19,10 +20,10 @@ describe('IssueInvoiceUseCaseImpl', () => {
   const aServiceInput = (): IssueInvoiceUseCaseInput => ({
     externalId: "external-456",
     amount: 2000,
-    idDocument: Identification.initialize(2012345678, DocumentType.CUIT),
+    idDocument: Identification.builder().type(DocumentType.CUIT).value(2012345678).build(),
     concept: CONCEPT.SERVICES,
-    serviceFrom: { day: 1, month: 6, year: 2023 },
-    serviceTo: { day: 15, month: 6, year: 2023 },
+    serviceFrom: Day.builder().day(1).month(6).year(2023).build(),
+    serviceTo: Day.builder().day(15).month(6).year(2023).build(),
     pointOfSale: 2
   });
 
@@ -158,7 +159,7 @@ describe('IssueInvoiceUseCaseImpl', () => {
   it('Given input with CUIT document, when executing, then should use CUIT document type', async () => {
     const input = {
       ...aValidInput(),
-      idDocument: Identification.initialize(2012345678, DocumentType.CUIT)
+      idDocument: Identification.builder().type(DocumentType.CUIT).value(2012345678).build()
     };
 
     mockIdempotencyStore.get.mockResolvedValue(null);

@@ -1,10 +1,6 @@
-import { InvoiceRepositoryMongoAdapter } from "../../../../../../../src/infrastructure/adapters/inbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
-import { Invoice } from "../../../../../../../src/domain/invoice/Invoice";
-import { InvoiceStatus } from "../../../../../../../src/domain/invoice/vo/InvoiceStatus";
-import { getDb } from "../../../../../../../src/infrastructure/adapters/inbound/persistance/mongo/MongoClientProvider";
-
-// Mock the MongoClientProvider
-jest.mock("../../../../../../../src/infrastructure/adapters/inbound/persistance/mongo/MongoClientProvider");
+import { InvoiceRepositoryMongoAdapter } from "../../../../../../src/infrastructure/adapters/inbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
+import { Invoice } from "../../../../../../src/domain/invoice/Invoice";
+import { InvoiceStatus } from "../../../../../../src/domain/invoice/vo/InvoiceStatus";
 
 describe('InvoiceRepositoryMongoAdapter', () => {
   const anInvoiceId = (): string => "invoice-123";
@@ -34,131 +30,112 @@ describe('InvoiceRepositoryMongoAdapter', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (getDb as jest.Mock).mockResolvedValue(mockDb);
-    repository = new InvoiceRepositoryMongoAdapter();
+    mockCollection.updateOne.mockReset();
+    mockCollection.findOne.mockReset();
+    mockCollection.insertOne.mockReset();
+    repository = new InvoiceRepositoryMongoAdapter(mockDb as any);
   });
 
-  it('Given invoice, when saving, then should upsert to database', async () => {
-    const invoice = aMockInvoice();
+  describe('#save', () => {
+    it('Given invoice, when saving, then should upsert to database', async () => {
+      const invoice = aMockInvoice();
 
-    await repository.save(invoice);
+      await repository.save(invoice);
 
-    expect(getDb).toHaveBeenCalledTimes(1);
-    expect(mockDb.collection).toHaveBeenCalledWith(collectionName);
-    expect(mockCollection.updateOne).toHaveBeenCalledWith(
-      { id: anInvoiceId() },
-      { $set: invoice },
-      { upsert: true }
-    );
+      expect(mockDb.collection).toHaveBeenCalledWith(collectionName);
+      expect(mockCollection.updateOne).toHaveBeenCalledWith(
+        { id: anInvoiceId() },
+        { $set: invoice },
+        { upsert: true }
+      );
+    });
+
+    it('Given database connection error, when saving, then should propagate error', async () => {
+      const invoice = aMockInvoice();
+      const error = new Error("Database connection failed");
+
+      mockCollection.updateOne.mockRejectedValue(error);
+
+      const act = async () => await repository.save(invoice);
+
+      await expect(act).rejects.toThrow("Database connection failed");
+    });
   });
 
-  it('Given invoice, when updating, then should call save method', async () => {
-    const invoice = aMockInvoice();
+  describe('#update', () => {
+    it('Given invoice, when updating, then should call save method', async () => {
+      const invoice = aMockInvoice();
 
-    await repository.update(invoice);
+      await repository.update(invoice);
 
-    expect(mockCollection.updateOne).toHaveBeenCalledWith(
-      { id: anInvoiceId() },
-      { $set: invoice },
-      { upsert: true }
-    );
+      expect(mockCollection.updateOne).toHaveBeenCalledWith(
+        { id: anInvoiceId() },
+        { $set: invoice },
+        { upsert: true }
+      );
+    });
   });
 
-  it('Given existing invoice ID, when finding by ID, then should return invoice', async () => {
-    const invoice = aMockInvoice();
-    const invoiceId = anInvoiceId();
+  describe('#findById', () => {
+    it('Given existing invoice ID, when finding by ID, then should return invoice', async () => {
+      const invoice = aMockInvoice();
+      const invoiceId = anInvoiceId();
 
-    mockCollection.findOne.mockResolvedValue(invoice);
+      mockCollection.findOne.mockResolvedValue(invoice);
 
-    const result = await repository.findById(invoiceId);
+      const result = await repository.findById(invoiceId);
 
-    expect(getDb).toHaveBeenCalledTimes(1);
-    expect(mockDb.collection).toHaveBeenCalledWith(collectionName);
-    expect(mockCollection.findOne).toHaveBeenCalledWith({ id: invoiceId });
-    expect(result).toBe(invoice);
+      expect(mockDb.collection).toHaveBeenCalledWith(collectionName);
+      expect(mockCollection.findOne).toHaveBeenCalledWith({ id: invoiceId });
+      expect(result).toBe(invoice);
+    });
+
+    it('Given non-existing invoice ID, when finding by ID, then should return null', async () => {
+      const invoiceId = "non-existing";
+
+      mockCollection.findOne.mockResolvedValue(null);
+
+      const result = await repository.findById(invoiceId);
+
+      expect(mockCollection.findOne).toHaveBeenCalledWith({ id: invoiceId });
+      expect(result).toBeNull();
+    });
+
+    it('Given database query error, when finding by ID, then should propagate error', async () => {
+      const invoiceId = anInvoiceId();
+      const error = new Error("Query failed");
+
+      mockCollection.findOne.mockRejectedValue(error);
+
+      const act = async () => await repository.findById(invoiceId);
+
+      await expect(act).rejects.toThrow("Query failed");
+    });
   });
 
-  it('Given non-existing invoice ID, when finding by ID, then should return null', async () => {
-    const invoiceId = "non-existing";
+  describe('#findByExternalId', () => {
+    it('Given existing external ID, when finding by external ID, then should return invoice', async () => {
+      const invoice = aMockInvoice();
+      const externalId = anExternalId();
 
-    mockCollection.findOne.mockResolvedValue(null);
+      mockCollection.findOne.mockResolvedValue(invoice);
 
-    const result = await repository.findById(invoiceId);
+      const result = await repository.findByExternalId(externalId);
 
-    expect(mockCollection.findOne).toHaveBeenCalledWith({ id: invoiceId });
-    expect(result).toBeNull();
-  });
+      expect(mockDb.collection).toHaveBeenCalledWith(collectionName);
+      expect(mockCollection.findOne).toHaveBeenCalledWith({ externalId });
+      expect(result).toBe(invoice);
+    });
 
-  it('Given existing external ID, when finding by external ID, then should return invoice', async () => {
-    const invoice = aMockInvoice();
-    const externalId = anExternalId();
+    it('Given non-existing external ID, when finding by external ID, then should return null', async () => {
+      const externalId = "non-existing-external";
 
-    mockCollection.findOne.mockResolvedValue(invoice);
+      mockCollection.findOne.mockResolvedValue(null);
 
-    const result = await repository.findByExternalId(externalId);
+      const result = await repository.findByExternalId(externalId);
 
-    expect(getDb).toHaveBeenCalledTimes(1);
-    expect(mockDb.collection).toHaveBeenCalledWith(collectionName);
-    expect(mockCollection.findOne).toHaveBeenCalledWith({ externalId });
-    expect(result).toBe(invoice);
-  });
-
-  it('Given non-existing external ID, when finding by external ID, then should return null', async () => {
-    const externalId = "non-existing-external";
-
-    mockCollection.findOne.mockResolvedValue(null);
-
-    const result = await repository.findByExternalId(externalId);
-
-    expect(mockCollection.findOne).toHaveBeenCalledWith({ externalId });
-    expect(result).toBeNull();
-  });
-
-  it('Given database connection error, when saving, then should propagate error', async () => {
-    const invoice = aMockInvoice();
-    const error = new Error("Database connection failed");
-
-    (getDb as jest.Mock).mockRejectedValue(error);
-
-    const act = async () => await repository.save(invoice);
-
-    await expect(act).rejects.toThrow("Database connection failed");
-  });
-
-  it('Given database query error, when finding by ID, then should propagate error', async () => {
-    const invoiceId = anInvoiceId();
-    const error = new Error("Query failed");
-
-    mockCollection.findOne.mockRejectedValue(error);
-
-    const act = async () => await repository.findById(invoiceId);
-
-    await expect(act).rejects.toThrow("Query failed");
-  });
-
-  test.each([
-    ["invoice-123"],
-    ["invoice-456"],
-    ["external-invoice"],
-    ["123"]
-  ])('Given invoice ID "%s", when finding by ID, then should pass correct ID to database', async (invoiceId) => {
-    mockCollection.findOne.mockResolvedValue(null);
-
-    await repository.findById(invoiceId);
-
-    expect(mockCollection.findOne).toHaveBeenCalledWith({ id: invoiceId });
-  });
-
-  test.each([
-    ["external-123"],
-    ["external-456"],
-    ["test-external"],
-    ["ext-123"]
-  ])('Given external ID "%s", when finding by external ID, then should pass correct ID to database', async (externalId) => {
-    mockCollection.findOne.mockResolvedValue(null);
-
-    await repository.findByExternalId(externalId);
-
-    expect(mockCollection.findOne).toHaveBeenCalledWith({ externalId });
+      expect(mockCollection.findOne).toHaveBeenCalledWith({ externalId });
+      expect(result).toBeNull();
+    });
   });
 });

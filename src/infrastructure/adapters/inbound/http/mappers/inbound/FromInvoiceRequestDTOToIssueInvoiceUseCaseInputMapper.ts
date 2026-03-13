@@ -4,6 +4,7 @@ import { Mapper } from "../../../../../../../framework/Mapper";
 import { CONCEPT } from "../../../../../../domain/invoice/vo/Concept";
 import { DocumentType } from "../../../../../../domain/invoice/vo/Identification";
 import { Identification } from "../../../../../../domain/invoice/vo/Identification";
+import { Day } from "../../../../../../domain/invoice/vo/Day";
 
 type RestDTOError = {
 	path: string;
@@ -24,27 +25,34 @@ export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper implements Ma
 	public map(invoiceDTO: InvoiceRequestDTO, idk: string | undefined): IssueInvoiceUseCaseInput {
 		this.validateDTO(invoiceDTO);
 
-    // TODO: extract own mapper
-    const idDoc: Identification = Identification.builder()
-      .type(invoiceDTO.dni ? DocumentType.DNI : invoiceDTO.cuit ? DocumentType.CUIT : DocumentType.UNRECOGNIZED)
-      .value(invoiceDTO.dni ? invoiceDTO.dni : invoiceDTO.cuit ? invoiceDTO.cuit : Number.NaN)
+    const idDocument: Identification = Identification.builder()
+      .type(invoiceDTO.dni ? DocumentType.DNI : (invoiceDTO.cuit ? DocumentType.CUIT : DocumentType.UNRECOGNIZED))
+      .value(invoiceDTO.dni ? invoiceDTO.dni : (invoiceDTO.cuit ? invoiceDTO.cuit : Number.NaN))
       .build();
+
+    const serviceFrom = invoiceDTO.concept === CONCEPT.SERVICES ? 
+      Day.builder()
+        .day(Number(invoiceDTO.serviceFrom?.split("-")[2]))
+        .month(Number(invoiceDTO.serviceFrom?.split("-")[1]))
+        .year(Number(invoiceDTO.serviceFrom?.split("-")[0]))
+        .build() 
+      : undefined;
+
+    const serviceTo = invoiceDTO.concept === CONCEPT.SERVICES ? 
+      Day.builder()
+        .day(Number(invoiceDTO.serviceTo?.split("-")[2]))
+        .month(Number(invoiceDTO.serviceTo?.split("-")[1]))
+        .year(Number(invoiceDTO.serviceTo?.split("-")[0]))
+        .build() 
+      : undefined;
 
 		return {
       externalId: invoiceDTO.externalId ?? null,
       amount: invoiceDTO.monto,
-      idDocument: idDoc,
+      idDocument,
       concept: invoiceDTO.concept === CONCEPT.PRODUCTS ? CONCEPT.PRODUCTS : CONCEPT.SERVICES,
-      serviceFrom: {
-				day: Number(invoiceDTO.serviceFrom?.split("-")[2]),
-				month: Number(invoiceDTO.serviceFrom?.split("-")[1]),
-				year: Number(invoiceDTO.serviceFrom?.split("-")[0]),
-			},
-      serviceTo: {
-				day: Number(invoiceDTO.serviceTo?.split("-")[2]),
-				month: Number(invoiceDTO.serviceTo?.split("-")[1]),
-				year: Number(invoiceDTO.serviceTo?.split("-")[0]),
-			},
+      serviceFrom,
+      serviceTo,
       pointOfSale: invoiceDTO.pointOfSale,
       idempotencyKey: idk,
     }

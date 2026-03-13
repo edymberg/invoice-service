@@ -31,7 +31,11 @@ describe('Day', () => {
       const month = aValidMonth();
       const year = aValidYear();
 
-      const dayInstance = Day.initialize(day, month, year);
+      const dayInstance = Day.builder()
+        .day(day)
+        .month(month)
+        .year(year)
+        .build();
 
       expect(dayInstance.numericDate).toBe(20230615);
     });

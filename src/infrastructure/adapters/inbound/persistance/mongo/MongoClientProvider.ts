@@ -6,7 +6,7 @@ export class MongoClientProvider {
   private static client: MongoClient;
   private static db: Db;
 
-  static async getOrInitDataBase(): Promise<Db> {
+  public static async getOrInitDataBase(): Promise<Db> {
     if (this.db) return this.db;
 
     this.client = this.client || new MongoClient(env.mongo.uri);

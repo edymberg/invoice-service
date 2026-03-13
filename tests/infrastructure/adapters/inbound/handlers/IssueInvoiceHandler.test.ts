@@ -2,9 +2,9 @@ import { IssueInvoiceHandler } from "../../../../../src/infrastructure/adapters/
 import { IssueInvoiceUseCaseInput } from "../../../../../src/domain/invoice/usecases/IssueInvoice";
 import { Invoice } from "../../../../../src/domain/invoice/Invoice";
 import { InvoiceStatus } from "../../../../../src/domain/invoice/vo/InvoiceStatus";
+import { Identification, DocumentType } from "../../../../../src/domain/invoice/vo/Identification";
 
 describe('IssueInvoiceHandler', () => {
-  // Factory methods for test data
   const aValidInput = (): any => ({
     externalId: "external-123",
     monto: 1000,
@@ -14,11 +14,7 @@ describe('IssueInvoiceHandler', () => {
   const aValidUseCaseInput = (): IssueInvoiceUseCaseInput => ({
     externalId: "external-123",
     amount: 1000,
-    idDocument: {
-      dni: true,
-      cuit: false,
-      value: 12345678
-    },
+    idDocument: Identification.builder().type(DocumentType.DNI).value(12345678).build(),
     concept: 1
   });
 
@@ -34,7 +30,6 @@ describe('IssueInvoiceHandler', () => {
     cae: "12345678901234"
   });
 
-  // Mock dependencies
   const mockUseCase = {
     execute: jest.fn()
   };

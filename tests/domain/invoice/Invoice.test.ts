@@ -16,10 +16,10 @@ describe('Invoice', () => {
   const aProductConcept = (): Concept => Concept.from(CONCEPT.PRODUCTS);
   const aServiceConcept = (): Concept => Concept.from(CONCEPT.SERVICES);
   const anIdentification = (): Identification => Identification.builder().value(12345678).type(DocumentType.DNI).build();
-  const aDay = (): Day => Day.initialize(15, 6, 2023);
+  const aDay = (): Day => Day.builder().day(15).month(6).year(2023).build();
   const anAmount = (): Money => Money.fromTotal(1000);
-  const aServiceFromDay = (): Day => Day.initialize(15, 6, 2023);
-  const aServiceToDay = (): Day => Day.initialize(15, 6, 2023);
+  const aServiceFromDay = (): Day => Day.builder().day(15).month(6).year(2023).build();
+  const aServiceToDay = (): Day => Day.builder().day(15).month(6).year(2023).build();
   const anAfipInfo = (): AfipVoucherInfo => ({
     cae: "12345678901234",
     caeExpiration: "20231231",

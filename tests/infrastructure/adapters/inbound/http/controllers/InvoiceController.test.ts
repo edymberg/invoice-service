@@ -1,8 +1,4 @@
 import { InvoiceController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/InvoiceController";
-import { GetInvoiceQuery } from "../../../../../../src/business/usecases/GetInvoiceQuery";
-import { GeneratePdfQuery } from "../../../../../../src/business/usecases/GeneratePdfQuery";
-import { FromHttpToInvoiceRequestDTOMapper } from "../../../../../../src/infrastructure/adapters/inbound/http/mappers/infra/FromHttpToInvoiceRequestDTOMapper";
-import { UseCaseHandler } from "../../../../../../src/infrastructure/adapters/inbound/handlers/UseCaseHandler";
 import { InvoiceRequestDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/InvoiceRequestDTO";
 import { InvoiceResponseDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/InvoiceResponseDTO";
 import { Request, Response } from "express";
@@ -85,7 +81,6 @@ describe('InvoiceController', () => {
     jest.clearAllMocks();
     controller = new InvoiceController(
       mockGetInvoice as any,
-      mockPdfQuery as any,
       mockInfraMapper as any,
       mockInvoiceHandler as any
     );
@@ -94,7 +89,7 @@ describe('InvoiceController', () => {
   });
 
   describe('create method', () => {
-    it('Given valid request body, when creating invoice, then should map request and handle use case', () => {
+    it('Given valid request body, when creating invoice, then should map request and handle use case', async () => {
       const invoiceDTO = aValidInvoiceRequestDTO();
       const responseDTO = aValidInvoiceResponseDTO();
       const idempotencyKey = "idem-123";
@@ -102,7 +97,7 @@ describe('InvoiceController', () => {
       mockInfraMapper.map.mockReturnValue(invoiceDTO);
       mockInvoiceHandler.handle.mockReturnValue(responseDTO);
 
-      controller.create(req, res);
+      await controller.create(req, res);
 
       expect(mockInfraMapper.map).toHaveBeenCalledWith(req.body);
       expect(mockInvoiceHandler.handle).toHaveBeenCalledWith(invoiceDTO, idempotencyKey);
@@ -110,7 +105,7 @@ describe('InvoiceController', () => {
       expect(res.json).toHaveBeenCalledWith(responseDTO);
     });
 
-    it('Given request without idempotency key, when creating invoice, then should pass undefined as idempotency key', () => {
+    it('Given request without idempotency key, when creating invoice, then should pass undefined as idempotency key', async () => {
       const reqWithoutIdk = {
         ...req,
         headers: {}
@@ -121,23 +116,23 @@ describe('InvoiceController', () => {
       mockInfraMapper.map.mockReturnValue(invoiceDTO);
       mockInvoiceHandler.handle.mockReturnValue(responseDTO);
 
-      controller.create(reqWithoutIdk, res);
+      await controller.create(reqWithoutIdk, res);
 
       expect(mockInvoiceHandler.handle).toHaveBeenCalledWith(invoiceDTO, undefined);
     });
 
-    it('Given mapper throws error, when creating invoice, then should propagate error', () => {
+    it('Given mapper throws error, when creating invoice, then should propagate error', async () => {
       const error = new Error("Invalid request body");
 
       mockInfraMapper.map.mockImplementation(() => {
         throw error;
       });
 
-      expect(() => controller.create(req, res)).toThrow("Invalid request body");
+      await expect(controller.create(req, res)).rejects.toThrow("Invalid request body");
       expect(mockInvoiceHandler.handle).not.toHaveBeenCalled();
     });
 
-    it('Given handler throws error, when creating invoice, then should propagate error', () => {
+    it('Given handler throws error, when creating invoice, then should propagate error', async () => {
       const invoiceDTO = aValidInvoiceRequestDTO();
       const error = new Error("Handler error");
 
@@ -146,7 +141,7 @@ describe('InvoiceController', () => {
         throw error;
       });
 
-      expect(() => controller.create(req, res)).toThrow("Handler error");
+      await expect(controller.create(req, res)).rejects.toThrow("Handler error");
     });
   });
 });

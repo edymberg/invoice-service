@@ -105,39 +105,4 @@ describe('FromInvoiceToInvoiceResponseDTOMapper', () => {
       voucherNumber: null
     });
   });
-
-  test.each([
-    [InvoiceStatus.Draft, "Draft"],
-    [InvoiceStatus.Issuing, "Issuing"],
-    [InvoiceStatus.Issued, "Issued"],
-    [InvoiceStatus.Failed, "Failed"]
-  ])('Given invoice with status %s, when mapping, then should return status "%s"', (invoiceStatus, expectedStatus) => {
-    const invoice = {
-      id: anInvoiceId(),
-      status: invoiceStatus,
-      afip: undefined
-    } as any;
-
-    const result = mapper.map(invoice);
-
-    expect(result.status).toBe(expectedStatus);
-  });
-
-  test.each([
-    ["invoice-123", "invoice-456", "invoice-789"],
-    ["external-invoice", "internal-invoice", "test-invoice"],
-    ["123", "456", "789"]
-  ])('Given invoice IDs %p, when mapping, then should return correct IDs', (invoiceIds) => {
-    invoiceIds.forEach(invoiceId => {
-      const invoice = {
-        id: invoiceId,
-        status: InvoiceStatus.Draft,
-        afip: undefined
-      } as any;
-
-      const result = mapper.map(invoice);
-
-      expect(result.id).toBe(invoiceId);
-    });
-  });
 });

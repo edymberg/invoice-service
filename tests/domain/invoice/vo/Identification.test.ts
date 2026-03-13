@@ -41,14 +41,13 @@ describe('Identification', () => {
       expect(identification.type).toBe(type);
     });
 
-    it('Given string number value, when creating identification, then should convert to number', () => {
+    it('Given string number value, when creating identification, then should throw error', () => {
       const value = "12345678";
       const type = DocumentType.DNI;
 
-      const identification = Identification.builder().value(value as unknown as number).type(type).build();
+      const act = () => Identification.builder().value(value as unknown as number).type(type).build();
 
-      expect(identification.value).toBe(12345678);
-      expect(identification.type).toBe(type);
+      expect(act).toThrow("Invalid value: 12345678. Should be a positive integer");
     });
 
     it('Given null value, when creating identification, then should throw error', () => {
@@ -57,7 +56,7 @@ describe('Identification', () => {
 
       const act = () => Identification.builder().value(value as unknown as number).type(type).build();
 
-      expect(act).toThrow("Value required");
+      expect(act).toThrow("Value is required. Given: null");
     });
 
     it('Given undefined value, when creating identification, then should throw error', () => {
@@ -66,7 +65,7 @@ describe('Identification', () => {
 
       const act = () => Identification.builder().value(value as unknown as number).type(type).build();
 
-      expect(act).toThrow("Value required");
+      expect(act).toThrow("Value is required. Given: undefined");
     });
 
     it('Given empty string value, when creating identification, then should throw error', () => {
@@ -75,7 +74,7 @@ describe('Identification', () => {
 
       const act = () => Identification.builder().value(value as unknown as number).type(type).build();
 
-      expect(act).toThrow("Invalid value");
+      expect(act).toThrow("Invalid value: empty string. Should be a positive integer");
     });
 
     it('Given zero value, when creating identification, then should throw error', () => {
@@ -84,7 +83,7 @@ describe('Identification', () => {
 
       const act = () => Identification.builder().value(value).type(type).build();
 
-      expect(act).toThrow("Invalid value");
+      expect(act).toThrow("Invalid value: 0. Should be a positive integer");
     });
 
     it('Given negative value, when creating identification, then should throw error', () => {
@@ -93,7 +92,7 @@ describe('Identification', () => {
 
       const act = () => Identification.builder().value(value).type(type).build();
 
-      expect(act).toThrow("Invalid value");
+      expect(act).toThrow("Invalid value: -12345678. Should be a positive integer");
     });
 
     it('Given short value, when creating identification, then should throw error', () => {
@@ -102,7 +101,7 @@ describe('Identification', () => {
 
       const act = () => Identification.builder().value(value).type(type).build();
 
-      expect(act).toThrow("Invalid value length");
+      expect(act).toThrow("Invalid value length: 4. Should be between 5 and 12");
     });
 
     it('Given long value, when creating identification, then should throw error', () => {
@@ -111,7 +110,7 @@ describe('Identification', () => {
 
       const act = () => Identification.builder().value(value).type(type).build();
 
-      expect(act).toThrow("Invalid value length");
+      expect(act).toThrow("Invalid value length: 13. Should be between 5 and 12");
     });
   });
 });

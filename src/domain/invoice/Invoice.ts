@@ -6,8 +6,9 @@ import { VoucherType } from "./vo/VoucherType";
 import { CONCEPT, Concept } from "./vo/Concept";
 import { Day } from "./vo/Day";
 import { Identification, DocumentType } from "./vo/Identification";
+import { BusinessRuleViolation } from "../../../framework/BusinessRuleViolation";
 
-export class InvoiceBusinessRuleViolation extends Error {
+export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
   constructor(message: string) {
     super(message);
   }

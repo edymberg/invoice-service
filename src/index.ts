@@ -8,7 +8,6 @@ buildApp()
       console.log(`Server listening on :${env.port}`);
     });
   })
-  .catch(error => {
-      // eslint-disable-next-line no-console
-      console.error("Something went wrong", error);
-  })
+  .catch((error) => {
+    console.error("Something went wrong", error);
+  });

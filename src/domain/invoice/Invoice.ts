@@ -1,11 +1,11 @@
-import { Money } from "./vo/Money";
-import { PointOfSale } from "./vo/PointOfSale";
-import { InvoiceStatus } from "./vo/InvoiceStatus";
 import { AfipVoucherInfo } from "./vo/AfipVoucherInfo";
-import { VoucherType } from "./vo/VoucherType";
 import { CONCEPT, Concept } from "./vo/Concept";
 import { Day } from "./vo/Day";
 import { Identification, DocumentType } from "./vo/Identification";
+import { InvoiceStatus } from "./vo/InvoiceStatus";
+import { Money } from "./vo/Money";
+import { PointOfSale } from "./vo/PointOfSale";
+import { VoucherType } from "./vo/VoucherType";
 import { BusinessRuleViolation } from "../../../framework/BusinessRuleViolation";
 
 export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
@@ -18,7 +18,7 @@ interface InvoiceBusinessRule {
   validate(invoice: Invoice): void;
 }
 
-class ConceptServicesBusinessRules implements InvoiceBusinessRule {  
+class ConceptServicesBusinessRules implements InvoiceBusinessRule {
   validate(invoice: Invoice): void {
     if (invoice.isServiceConcept() && !invoice.serviceFrom) {
       throw new InvoiceBusinessRuleViolation("ServiceFrom is required for Concept.SERVICES");
@@ -28,7 +28,6 @@ class ConceptServicesBusinessRules implements InvoiceBusinessRule {
     }
   }
 }
-
 
 interface InvoiceFactoryI {
   build(): Invoice;
@@ -49,9 +48,7 @@ interface InvoiceFactoryI {
 
 export class Invoice {
   // TODO: ¿las business rules deberian ser pasadas por constructor?
-  private businessRules: InvoiceBusinessRule[] = [
-    new ConceptServicesBusinessRules()
-  ];
+  private businessRules: InvoiceBusinessRule[] = [new ConceptServicesBusinessRules()];
 
   private constructor(
     public readonly id: string,
@@ -66,7 +63,7 @@ export class Invoice {
     public readonly serviceTo?: Day,
     public readonly afip?: AfipVoucherInfo,
     public readonly externalId?: string,
-  ) { }
+  ) {}
 
   private static _initialize(
     id: string,
@@ -80,10 +77,23 @@ export class Invoice {
     serviceFrom?: Day,
     serviceTo?: Day,
     afip?: AfipVoucherInfo,
-    externalId?: string
+    externalId?: string,
   ) {
-    const invoice = new Invoice(id, status, pointOfSale, voucherType, concept, idDocument, date, amount, serviceFrom, serviceTo, afip, externalId);
-    invoice.businessRules.forEach(rule => rule.validate(invoice));
+    const invoice = new Invoice(
+      id,
+      status,
+      pointOfSale,
+      voucherType,
+      concept,
+      idDocument,
+      date,
+      amount,
+      serviceFrom,
+      serviceTo,
+      afip,
+      externalId,
+    );
+    invoice.businessRules.forEach((rule) => rule.validate(invoice));
     return invoice;
   }
 
@@ -91,7 +101,7 @@ export class Invoice {
     return new Invoice.Factory();
   }
 
-  public markIssuing() { 
+  public markIssuing() {
     return Invoice._initialize(
       this.id,
       InvoiceStatus.Issuing,
@@ -125,7 +135,7 @@ export class Invoice {
     );
   }
 
-  public markFailed(reason: string) {
+  public markFailed() {
     return Invoice._initialize(
       this.id,
       InvoiceStatus.Failed,
@@ -142,18 +152,36 @@ export class Invoice {
     );
   }
 
-  public docType(): DocumentType { return this.idDocument.type; }
-  public docNumber(): number { return this.idDocument.value; }
-  public currency(): string { return this.amount.currency; }
-  public isProductConcept(): boolean { return this.concept.isProduct(); }
-  public isServiceConcept(): boolean { return this.concept.isService(); }
-  public totalAmount(): number { return this.amount.amount; }
-  public pointOfSaleValue(): number { return this.pointOfSale.value; }
-  public conceptValue(): CONCEPT { return this.concept.value; }
-  public dateValue(): number { return this.date.numericDate; }
-
+  public docType(): DocumentType {
+    return this.idDocument.type;
+  }
+  public docNumber(): number {
+    return this.idDocument.value;
+  }
+  public currency(): string {
+    return this.amount.currency;
+  }
+  public isProductConcept(): boolean {
+    return this.concept.isProduct();
+  }
+  public isServiceConcept(): boolean {
+    return this.concept.isService();
+  }
+  public totalAmount(): number {
+    return this.amount.amount;
+  }
+  public pointOfSaleValue(): number {
+    return this.pointOfSale.value;
+  }
+  public conceptValue(): CONCEPT {
+    return this.concept.value;
+  }
+  public dateValue(): number {
+    return this.date.numericDate;
+  }
 
   private static Factory = class InvoiceFactory implements InvoiceFactoryI {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private invoiceFieldsMap: Record<string, any>;
 
     constructor() {
@@ -173,11 +201,11 @@ export class Invoice {
         this.invoiceFieldsMap.serviceFrom,
         this.invoiceFieldsMap.serviceTo,
         this.invoiceFieldsMap.afip,
-        this.invoiceFieldsMap.externalId
+        this.invoiceFieldsMap.externalId,
       );
     }
 
-    id(id: string): InvoiceFactoryI  {
+    id(id: string): InvoiceFactoryI {
       this.invoiceFieldsMap.id = id;
       return this;
     }

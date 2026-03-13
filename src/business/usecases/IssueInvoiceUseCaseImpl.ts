@@ -1,16 +1,25 @@
 import { v4 as uuid } from "uuid";
-import { InvoiceRepository } from "../../domain/invoice/repositories/InvoiceRepository";
-import { CreateNextVoucherResult, CreateVoucherRequest, ElectronicBillingPort } from "../ports/ElectronicBillingPort";
-import { IdempotencyStore } from "../ports/IdempotencyStore";
+
 import { Invoice } from "../../domain/invoice/Invoice";
+import { InvoiceRepository } from "../../domain/invoice/repositories/InvoiceRepository";
+import {
+  IssueInvoiceUseCase,
+  IssueInvoiceUseCaseInput,
+  IssueInvoiceUseCaseOutput,
+} from "../../domain/invoice/usecases/IssueInvoice";
+import { AfipVoucherInfo } from "../../domain/invoice/vo/AfipVoucherInfo";
+import { Concept } from "../../domain/invoice/vo/Concept";
 import { Day } from "../../domain/invoice/vo/Day";
+import { InvoiceStatus } from "../../domain/invoice/vo/InvoiceStatus";
 import { Money } from "../../domain/invoice/vo/Money";
 import { PointOfSale } from "../../domain/invoice/vo/PointOfSale";
 import { VoucherType } from "../../domain/invoice/vo/VoucherType";
-import { Concept } from "../../domain/invoice/vo/Concept";
-import { AfipVoucherInfo } from "../../domain/invoice/vo/AfipVoucherInfo";
-import { InvoiceStatus } from "../../domain/invoice/vo/InvoiceStatus";
-import { IssueInvoiceUseCase, IssueInvoiceUseCaseInput, IssueInvoiceUseCaseOutput } from "../../domain/invoice/usecases/IssueInvoice";
+import {
+  CreateNextVoucherResult,
+  CreateVoucherRequest,
+  ElectronicBillingPort,
+} from "../ports/ElectronicBillingPort";
+import { IdempotencyStore } from "../ports/IdempotencyStore";
 
 export class IssueInvoiceUseCaseImpl implements IssueInvoiceUseCase {
   constructor(
@@ -26,7 +35,9 @@ export class IssueInvoiceUseCaseImpl implements IssueInvoiceUseCase {
       const existed = await this.idem.get(idemKey);
       if (existed) {
         const inv = await this.repo.findById(existed.invoiceId);
-        if (inv) return { invoice: inv };
+        if (inv) {
+          return { invoice: inv };
+        }
       }
     }
 
@@ -43,9 +54,6 @@ export class IssueInvoiceUseCaseImpl implements IssueInvoiceUseCase {
       .pointOfSale(PointOfSale.from(input.pointOfSale))
       .date(Day.today())
       .build();
-
-        
-
 
     const issuingInv = inv.markIssuing();
 
@@ -67,20 +75,31 @@ export class IssueInvoiceUseCaseImpl implements IssueInvoiceUseCase {
       MonId: issuingInv.currency(),
       MonCotiz: 1,
       ...(issuingInv.isServiceConcept()
-        ? { FchServDesde: issuingInv.serviceFrom?.numericDate, FchServHasta: issuingInv.serviceTo?.numericDate }
-        : {})
+        ? {
+            FchServDesde: issuingInv.serviceFrom?.numericDate,
+            FchServHasta: issuingInv.serviceTo?.numericDate,
+          }
+        : {}),
     };
 
     try {
       const res: CreateNextVoucherResult = await this.ebill.createNextVoucher(data);
       // TODO: Mapping from response to VO:
-      const afipResponse: AfipVoucherInfo = { cae: res.CAE, caeExpiration: res.CAEFchVto, voucherNumber: res.voucherNumber, afipResponse: res.rawResponse };
+      const afipResponse: AfipVoucherInfo = {
+        cae: res.CAE,
+        caeExpiration: res.CAEFchVto,
+        voucherNumber: res.voucherNumber,
+        afipResponse: res.rawResponse,
+      };
       const issuedInv = issuingInv.markIssued(afipResponse);
       await this.repo.save(issuedInv);
-      if (idemKey) await this.idem.put(idemKey, issuedInv.id);
+      if (idemKey) {
+        await this.idem.put(idemKey, issuedInv.id);
+      }
       return { invoice: issuedInv };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      const failedInv = issuingInv.markFailed(e?.message ?? "AFIP/ARCA error");
+      const failedInv = issuingInv.markFailed();
       await this.repo.save(failedInv);
       throw e;
     }

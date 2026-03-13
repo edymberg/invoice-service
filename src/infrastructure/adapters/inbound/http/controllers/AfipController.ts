@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import { GetAfipStatusQuery } from "../../../../../business/usecases/GetAfipStatusQuery";
 
 export class AfipController {

@@ -1,9 +1,12 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
+
 import { logger } from "../../../../logging/logger";
 
 // TODO: handle DTOMappingException and Domain Exceptions
 
-export function errorHandler(err: any, req: Request, res: Response, _next: NextFunction) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function errorHandler(err: any, req: Request, res: Response) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const id = (req as any).correlationId;
   // Sanitizar posible DNI en el mensaje
   const msg = (err?.message ?? "Internal Server Error").replace(/\b(\d{4,8})\b/g, "***");

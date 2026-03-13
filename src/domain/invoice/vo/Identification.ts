@@ -10,21 +10,26 @@ interface IdentificationBusinessRule {
   validate(identification: Identification): void;
 }
 
-class IdentificationValueBusinessRules implements IdentificationBusinessRule {  
+class IdentificationValueBusinessRules implements IdentificationBusinessRule {
   validate(identification: Identification): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const value: any = identification.value;
 
     if (value === null || value === undefined) {
       throw new IdentificationBusinessRuleViolation(`Value is required. Given: ${value}`);
     }
     if (!Number.isInteger(value) || value <= 0) {
-      throw new IdentificationBusinessRuleViolation(`Invalid value: ${value === "" ? "empty string" : value}. Should be a positive integer`);
+      throw new IdentificationBusinessRuleViolation(
+        `Invalid value: ${value === "" ? "empty string" : value}. Should be a positive integer`,
+      );
     }
     const len = value.toString().length;
     const minLen = 5;
     const maxLen = 12;
     if (len < minLen || len > maxLen) {
-      throw new IdentificationBusinessRuleViolation(`Invalid value length: ${len}. Should be between ${minLen} and ${maxLen}`);
+      throw new IdentificationBusinessRuleViolation(
+        `Invalid value length: ${len}. Should be between ${minLen} and ${maxLen}`,
+      );
     }
   }
 }
@@ -36,21 +41,19 @@ export enum DocumentType {
 }
 
 interface IdentificationFactoryI {
-  build(): Identification
-  type(type: DocumentType): IdentificationFactoryI
-  value(value: number): IdentificationFactoryI
+  build(): Identification;
+  type(type: DocumentType): IdentificationFactoryI;
+  value(value: number): IdentificationFactoryI;
 }
 
 // TODO: review business rules as Invoice
 export class Identification {
   // TODO: ¿las business rules deberian ser pasadas por constructor?
-  private businessRules: IdentificationBusinessRule[] = [
-    new IdentificationValueBusinessRules()
-  ];
+  private businessRules: IdentificationBusinessRule[] = [new IdentificationValueBusinessRules()];
 
   private constructor(
     public readonly type: DocumentType,
-    public readonly value: number
+    public readonly value: number,
   ) {}
 
   public static builder(): IdentificationFactoryI {
@@ -59,11 +62,12 @@ export class Identification {
 
   private static _initialize(value: number, type: DocumentType): Identification {
     const identification = new Identification(type, value);
-    identification.businessRules.forEach(rule => rule.validate(identification));
+    identification.businessRules.forEach((rule) => rule.validate(identification));
     return identification;
   }
 
   private static Factory = class IdentificationFactory implements IdentificationFactoryI {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private fieldsMap: Record<string, any>;
 
     constructor() {
@@ -73,7 +77,7 @@ export class Identification {
     public build(): Identification {
       return Identification._initialize(this.fieldsMap.value, this.fieldsMap.type);
     }
-    
+
     public type(type: DocumentType): IdentificationFactoryI {
       this.fieldsMap.type = type;
       return this;
@@ -83,5 +87,5 @@ export class Identification {
       this.fieldsMap.value = value;
       return this;
     }
-  }
+  };
 }

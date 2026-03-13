@@ -1,11 +1,12 @@
 import { Router } from "express";
+
+import { AfipController } from "./controllers/AfipController";
+import { HealthController } from "./controllers/HealthController";
+import { InvoiceController } from "./controllers/InvoiceController";
+import { SalesPointsController } from "./controllers/SalesPointsController";
 import { authMiddleware } from "./middlewares/auth";
 import { correlationMiddleware } from "./middlewares/correlation";
 import { errorHandler } from "./middlewares/errorHandler";
-import { InvoiceController } from "./controllers/InvoiceController";
-import { AfipController } from "./controllers/AfipController";
-import { HealthController } from "./controllers/HealthController";
-import { SalesPointsController } from "./controllers/SalesPointsController";
 
 export function buildRouter(deps: {
   invoiceController: InvoiceController;

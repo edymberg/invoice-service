@@ -1,4 +1,4 @@
-import { InvoiceRepositoryMongoAdapter } from "../../../../../../src/infrastructure/adapters/inbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
+import { InvoiceRepositoryMongoAdapter } from "../../../../../../src/infrastructure/adapters/outbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
 import { Invoice } from "../../../../../../src/domain/invoice/Invoice";
 import { InvoiceStatus } from "../../../../../../src/domain/invoice/vo/InvoiceStatus";
 

@@ -1,10 +1,10 @@
 import z from "zod";
 
+import { Mapper } from "../../../../../../../framework/Mapper";
 import { InvoiceRequestDTO } from "../../dtos/InvoiceRequestDTO";
 
-export class FromHttpToInvoiceRequestDTOMapper {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public map(json: any): InvoiceRequestDTO {
+export class FromHttpToInvoiceRequestDTOMapper implements Mapper<JSON, InvoiceRequestDTO> {
+  public map(json: JSON): InvoiceRequestDTO {
     const schema = z.object({
       externalId: z.string().min(1).nullable(),
       monto: z.number().positive(),

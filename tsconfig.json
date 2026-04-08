@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "openapi.yaml", "framework/TODO/AbstractUseCaseHandler.ts", "framework/BusinessRuleViolation.ts"]
+  "include": ["src", "openapi.yaml", "framework/TODO/mediator/AbstractUseCaseHandler.ts", "framework/BusinessRuleViolation.ts", "framework/logging"]
 }

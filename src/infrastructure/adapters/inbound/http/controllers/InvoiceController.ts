@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 
+import { Mapper } from "../../../../../../framework/Mapper";
 import { UseCaseHandler } from "../../../../../../framework/UseCaseHandler";
 import { GetInvoiceQuery } from "../../../../../business/usecases/GetInvoiceQuery";
 import { InvoiceRequestDTO } from "../dtos/InvoiceRequestDTO";
 import { InvoiceResponseDTO } from "../dtos/InvoiceResponseDTO";
-import { FromHttpToInvoiceRequestDTOMapper } from "../mappers/infra/FromHttpToInvoiceRequestDTOMapper";
 
 export class InvoiceController {
   constructor(
     private readonly getInvoice: GetInvoiceQuery,
-    private readonly infaMapper: FromHttpToInvoiceRequestDTOMapper,
+    private readonly infaMapper: Mapper<JSON, InvoiceRequestDTO>,
     private readonly invoiceHandler: UseCaseHandler<InvoiceRequestDTO, InvoiceResponseDTO>,
   ) {}
 

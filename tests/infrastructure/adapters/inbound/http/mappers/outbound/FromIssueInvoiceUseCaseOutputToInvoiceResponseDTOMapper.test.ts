@@ -1,8 +1,8 @@
-import { FromInvoiceToInvoiceResponseDTOMapper } from "../../../../../../../src/infrastructure/adapters/inbound/http/mappers/outbound/FromInvoiceToInvoiceResponseDTOMapper";
+import { FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper } from "../../../../../../../src/infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper";
 import { Invoice } from "../../../../../../../src/domain/invoice/Invoice";
 import { InvoiceStatus } from "../../../../../../../src/domain/invoice/vo/InvoiceStatus";
 
-describe('FromInvoiceToInvoiceResponseDTOMapper', () => {
+describe('FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper', () => {
   const anInvoiceId = (): string => "invoice-123";
   const aCae = (): string => "12345678901234";
   const aCaeExpiration = (): string => "20231231";
@@ -36,16 +36,18 @@ describe('FromInvoiceToInvoiceResponseDTOMapper', () => {
     } as any;
   };
 
-  let mapper: FromInvoiceToInvoiceResponseDTOMapper;
+  const anIssueInvoiceUseCaseOutput = (invoice: Invoice): any => ({ invoice });
+
+  let mapper: FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper;
 
   beforeEach(() => {
-    mapper = new FromInvoiceToInvoiceResponseDTOMapper();
+    mapper = new FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper();
   });
 
   it('Given draft invoice, when mapping, then should return response with null AFIP data', () => {
     const invoice = aDraftInvoice();
 
-    const result = mapper.map(invoice);
+    const result = mapper.map(anIssueInvoiceUseCaseOutput(invoice));
 
     expect(result).toStrictEqual({
       id: anInvoiceId(),
@@ -59,7 +61,7 @@ describe('FromInvoiceToInvoiceResponseDTOMapper', () => {
   it('Given issued invoice, when mapping, then should return response with AFIP data', () => {
     const invoice = anIssuedInvoice();
 
-    const result = mapper.map(invoice);
+    const result = mapper.map(anIssueInvoiceUseCaseOutput(invoice));
 
     expect(result).toStrictEqual({
       id: anInvoiceId(),
@@ -73,7 +75,7 @@ describe('FromInvoiceToInvoiceResponseDTOMapper', () => {
   it('Given failed invoice, when mapping, then should return response with null AFIP data', () => {
     const invoice = aFailedInvoice();
 
-    const result = mapper.map(invoice);
+    const result = mapper.map(anIssueInvoiceUseCaseOutput(invoice));
 
     expect(result).toStrictEqual({
       id: anInvoiceId(),
@@ -95,7 +97,7 @@ describe('FromInvoiceToInvoiceResponseDTOMapper', () => {
       }
     } as any;
 
-    const result = mapper.map(invoice);
+    const result = mapper.map(anIssueInvoiceUseCaseOutput(invoice));
 
     expect(result).toStrictEqual({
       id: anInvoiceId(),

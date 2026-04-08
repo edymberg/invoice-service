@@ -213,7 +213,7 @@ describe('Invoice', () => {
       const invoice = anInvoice(InvoiceStatus.Issuing, aProductConcept());
       const reason = "AFIP service unavailable";
 
-      const failedInvoice = invoice.markFailed(reason);
+      const failedInvoice = invoice.markFailed();
 
       expect(failedInvoice.id).toBe(invoice.id);
       expect(failedInvoice.status).toBe(InvoiceStatus.Failed);

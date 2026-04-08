@@ -1,5 +1,5 @@
-import { Mapper } from "../../../../../../../framework/Mapper";
-import { CreateNextVoucherResult } from "../../../../../../business/ports/ElectronicBillingPort";
+import { Mapper } from "../../../../../../../../framework/Mapper";
+import { CreateNextVoucherResult } from "../../../../../../../business/ports/ElectronicBillingPort";
 import { AFIPCreateNextVoucherResponse } from "../../dtos/Afip";
 
 export class FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper implements Mapper<

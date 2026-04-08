@@ -1,13 +1,13 @@
 import Afip from "@afipsdk/afip.js";
 
 import { AFIPCreateNextVoucherRequest, AFIPCreateNextVoucherResponse } from "./dtos/Afip";
-import { Mapper } from "../../../../../framework/Mapper";
+import { Mapper } from "../../../../../../framework/Mapper";
 import {
   ElectronicBillingPort,
   CreateVoucherRequest,
   CreateNextVoucherResult,
-} from "../../../../business/ports/ElectronicBillingPort";
-import { env } from "../../../config/env";
+} from "../../../../../business/ports/ElectronicBillingPort";
+import { env } from "../../../../config/env";
 
 export class AfipSdkElectronicBillingAdapter implements ElectronicBillingPort {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

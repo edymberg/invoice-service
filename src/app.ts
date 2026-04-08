@@ -12,14 +12,14 @@ import { SalesPointsController } from "./infrastructure/adapters/inbound/http/co
 import { InvoiceRequestDTO } from "./infrastructure/adapters/inbound/http/dtos/InvoiceRequestDTO";
 import { FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper } from "./infrastructure/adapters/inbound/http/mappers/inbound/FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper";
 import { FromHttpToInvoiceRequestDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/infra/FromHttpToInvoiceRequestDTOMapper";
-import { FromInvoiceToInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromInvoiceToInvoiceResponseDTOMapper";
+import { FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper";
 import { buildRouter } from "./infrastructure/adapters/inbound/http/routes";
-import { IdempotencyStoreMongoAdapter } from "./infrastructure/adapters/inbound/persistance/mongo/IdempotencyStoreMongoAdapter";
-import { InvoiceRepositoryMongoAdapter } from "./infrastructure/adapters/inbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
-import { MongoClientProvider } from "./infrastructure/adapters/inbound/persistance/mongo/MongoClientProvider";
-import { AfipSdkElectronicBillingAdapter } from "./infrastructure/adapters/outbound/sdk/AfipSdkElectronicBillingAdapter";
-import { FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper } from "./infrastructure/adapters/outbound/sdk/mappers/inbound/FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper";
-import { FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper } from "./infrastructure/adapters/outbound/sdk/mappers/outbound/FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper";
+import { IdempotencyStoreMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/IdempotencyStoreMongoAdapter";
+import { InvoiceRepositoryMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
+import { MongoClientProvider } from "./infrastructure/adapters/outbound/persistance/mongo/MongoClientProvider";
+import { AfipSdkElectronicBillingAdapter } from "./infrastructure/adapters/outbound/sdk/afip/AfipSdkElectronicBillingAdapter";
+import { FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper } from "./infrastructure/adapters/outbound/sdk/afip/mappers/inbound/FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper";
+import { FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper } from "./infrastructure/adapters/outbound/sdk/afip/mappers/outbound/FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper";
 
 export async function buildApp() {
   const app = express();
@@ -43,7 +43,7 @@ export async function buildApp() {
 
   // Mappers
   const infraMapper = new FromHttpToInvoiceRequestDTOMapper();
-  const outMapper = new FromInvoiceToInvoiceResponseDTOMapper();
+  const outMapper = new FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper();
   const inbMapper = new FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper();
 
   // Handlers

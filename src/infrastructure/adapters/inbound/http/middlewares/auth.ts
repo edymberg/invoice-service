@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import { env } from "../../../../config/env";
-import { logger } from "../../../../logging/logger";
+import { logger } from "../../../../../../framework/logging/logger";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   try {

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { logger } from "../../../../logging/logger";
+import { logger } from "../../../../../../framework/logging/logger";
 
 // TODO: handle DTOMappingException and Domain Exceptions
 

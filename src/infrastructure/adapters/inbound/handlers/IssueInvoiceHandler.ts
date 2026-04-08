@@ -1,3 +1,4 @@
+import { Logger, LoggerFactory } from "../../../../../framework/logging/logger";
 import { Mapper } from "../../../../../framework/Mapper";
 import { MaskedDTO } from "../../../../../framework/MaskedDTO";
 import { UseCaseHandler } from "../../../../../framework/UseCaseHandler";
@@ -8,7 +9,8 @@ import {
 } from "../../../../domain/invoice/usecases/IssueInvoice";
 
 export class IssueInvoiceHandler<I, O> implements UseCaseHandler<I, O> {
-  // TODO: private static readonly Logger logger = LoggerFactory.getLogger(CreateExampleHandler.class);
+  private readonly logger: Logger = LoggerFactory.getLogger("IssueInvoiceHandler");
+
   constructor(
     private readonly useCase: IssueInvoiceUseCase,
     private readonly inboundMapper: Mapper<I, IssueInvoiceUseCaseInput>,
@@ -16,9 +18,11 @@ export class IssueInvoiceHandler<I, O> implements UseCaseHandler<I, O> {
     private readonly maskedDTO: MaskedDTO<I>,
   ) {}
 
-  // TODO: review mappers
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async handle(input: I, args?: any): Promise<O> {
+    // TODO: this.logger.debug({ input: this.maskedDTO.mask(input) }, "Handling issue invoice request");
+    this.logger.debug(`Handling issue invoice request: ${this.maskedDTO.mask(input)}`);
+
     return this.outboundMapper.map(await this.useCase.execute(this.inboundMapper.map(input, args)));
   }
 }

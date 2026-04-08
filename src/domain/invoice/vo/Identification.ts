@@ -46,7 +46,6 @@ interface IdentificationFactoryI {
   value(value: number): IdentificationFactoryI;
 }
 
-// TODO: review business rules as Invoice
 export class Identification {
   // TODO: ¿las business rules deberian ser pasadas por constructor?
   private businessRules: IdentificationBusinessRule[] = [new IdentificationValueBusinessRules()];

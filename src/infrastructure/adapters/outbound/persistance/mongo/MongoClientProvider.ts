@@ -8,6 +8,7 @@ export class MongoClientProvider {
   private static db: Db;
 
   public static async getOrInitDataBase(): Promise<Db> {
+    console.log(`MongoDB connecting to ${env.mongo.uri}`);
     if (this.db) {
       return this.db;
     }

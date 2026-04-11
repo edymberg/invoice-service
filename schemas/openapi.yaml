@@ -95,25 +95,6 @@ paths:
         "404":
           description: No encontrada
 
-  /invoices/{id}/pdf:
-    get:
-      summary: Descargar PDF (stub)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string }
-      responses:
-        "200":
-          description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
-
   /afip/status:
     get:
       summary: Estado del servidor ARCA/AFIP

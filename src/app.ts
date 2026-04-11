@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 
 import { MaskedDTO } from "../framework/MaskedDTO";
@@ -23,6 +24,7 @@ import { FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper } from "./i
 
 export async function buildApp() {
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
   // Mongo DB

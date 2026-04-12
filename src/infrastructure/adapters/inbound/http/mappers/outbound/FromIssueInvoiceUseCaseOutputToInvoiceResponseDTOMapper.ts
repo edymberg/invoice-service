@@ -9,7 +9,7 @@ export class FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper implements 
   public map(output: IssueInvoiceUseCaseOutput): InvoiceResponseDTO {
     return {
       id: output.invoice.id,
-      status: output.invoice.status.toString(),
+      status: output.invoice.status.toString() as "Draft" | "Issuing" | "Issued" | "Failed",
       cae: output.invoice.afip?.cae ?? null,
       caeVto: output.invoice.afip?.caeExpiration ?? null,
       voucherNumber: output.invoice.afip?.voucherNumber ?? null,

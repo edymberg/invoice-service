@@ -36,6 +36,30 @@ npm run dev
 
 The server will start on port 3000 (or the port specified in `.env`).
 
+## API Documentation
+
+### Swagger UI
+
+Access the interactive API documentation at:
+```
+http://localhost:3000/api-docs
+```
+
+### Generate TypeScript Types
+
+TypeScript types are auto-generated from the OpenAPI schema. To regenerate them after modifying `schemas/openapi.yaml`:
+
+```bash
+npm run generate:api
+```
+
+Generated types are located at:
+```
+src/infrastructure/adapters/inbound/http/generated/api-types.ts
+```
+
+**Note**: This file is auto-generated. Do not edit manually.
+
 ## Docker Commands
 
 ```bash

@@ -1,7 +1,1 @@
-export type InvoiceResponseDTO = {
-  id: string;
-  status: string;
-  cae: string | null;
-  caeVto: string | null;
-  voucherNumber: number | null;
-};
+export type { CreateInvoiceResponseDTO as InvoiceResponseDTO } from "../generated/api-types";

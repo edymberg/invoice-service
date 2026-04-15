@@ -20,7 +20,6 @@ export class IssueInvoiceHandler<I, O> implements UseCaseHandler<I, O> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async handle(input: I, args?: any): Promise<O> {
-    // TODO: this.logger.debug({ input: this.maskedDTO.mask(input) }, "Handling issue invoice request");
     this.logger.debug(`Handling issue invoice request: ${this.maskedDTO.mask(input)}`);
 
     return this.outboundMapper.map(await this.useCase.execute(this.inboundMapper.map(input, args)));

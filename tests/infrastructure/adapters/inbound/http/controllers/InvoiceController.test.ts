@@ -1,11 +1,11 @@
+import { TypedRequest } from "../../../../../../framework/TypedRequest";
+import { TypedResponse } from "../../../../../../framework/TypedResponse";
 import { InvoiceController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/InvoiceController";
-import { InvoiceRequestDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/InvoiceRequestDTO";
-import { InvoiceResponseDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/InvoiceResponseDTO";
-import { Request, Response } from "express";
+import { CreateInvoiceRequestDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/CreateInvoiceRequestDTO";
+import { CreateInvoiceResponseDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/CreateInvoiceResponseDTO";
 
 describe('InvoiceController', () => {
-  // Factory methods for test data
-  const aValidRequestBody = (): any => ({
+  const aValidRequestBody = (): CreateInvoiceRequestDTO => ({
     externalId: "external-123",
     monto: 1000,
     dni: 12345678,
@@ -16,7 +16,7 @@ describe('InvoiceController', () => {
     pointOfSale: 1
   });
 
-  const aValidInvoiceRequestDTO = (): InvoiceRequestDTO => ({
+  const aValidCreateInvoiceRequestDTO = (): CreateInvoiceRequestDTO => ({
     externalId: "external-123",
     monto: 1000,
     dni: 12345678,
@@ -27,7 +27,7 @@ describe('InvoiceController', () => {
     pointOfSale: 1
   });
 
-  const aValidInvoiceResponseDTO = (): InvoiceResponseDTO => ({
+  const aValidCreateInvoiceResponseDTO = (): CreateInvoiceResponseDTO => ({
     id: "invoice-123",
     status: "Issued",
     cae: "12345678901234",
@@ -35,54 +35,43 @@ describe('InvoiceController', () => {
     voucherNumber: 1
   });
 
-  // Mock dependencies
   const mockGetInvoice = {
     execute: jest.fn()
-  };
-
-  const mockPdfQuery = {
-    execute: jest.fn()
-  };
-
-  const mockInfraMapper = {
-    map: jest.fn()
   };
 
   const mockInvoiceHandler = {
     handle: jest.fn()
   };
 
-  // Mock Express request and response
-  const mockRequest = () => {
-    const req: Partial<Request> = {
+  const mockRequest: () => TypedRequest<CreateInvoiceRequestDTO> = () => {
+    const req: Partial<TypedRequest<CreateInvoiceRequestDTO>> = {
       body: aValidRequestBody(),
       headers: {
         "idempotency-key": "idem-123"
       }
     };
-    return req as Request;
+    return req as TypedRequest<CreateInvoiceRequestDTO>;
   };
 
-  const mockResponse = () => {
-    const res: Partial<Response> = {
+  const mockResponse: () => TypedResponse<CreateInvoiceResponseDTO> = () => {
+    const res: Partial<TypedResponse<CreateInvoiceResponseDTO>> = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis(),
       send: jest.fn().mockReturnThis(),
       setHeader: jest.fn().mockReturnThis()
     };
-    return res as Response;
+    return res as TypedResponse<CreateInvoiceResponseDTO>;
   };
 
   let controller: InvoiceController;
-  let req: Request;
-  let res: Response;
+  let req: TypedRequest<CreateInvoiceRequestDTO>;
+  let res: TypedResponse<CreateInvoiceResponseDTO>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     controller = new InvoiceController(
       mockGetInvoice as any,
-      mockInfraMapper as any,
-      mockInvoiceHandler as any
+      mockInvoiceHandler as any,
     );
     req = mockRequest();
     res = mockResponse();
@@ -90,16 +79,14 @@ describe('InvoiceController', () => {
 
   describe('create method', () => {
     it('Given valid request body, when creating invoice, then should map request and handle use case', async () => {
-      const invoiceDTO = aValidInvoiceRequestDTO();
-      const responseDTO = aValidInvoiceResponseDTO();
+      const invoiceDTO = aValidCreateInvoiceRequestDTO();
+      const responseDTO = aValidCreateInvoiceResponseDTO();
       const idempotencyKey = "idem-123";
 
-      mockInfraMapper.map.mockReturnValue(invoiceDTO);
       mockInvoiceHandler.handle.mockReturnValue(responseDTO);
 
       await controller.create(req, res);
 
-      expect(mockInfraMapper.map).toHaveBeenCalledWith(req.body);
       expect(mockInvoiceHandler.handle).toHaveBeenCalledWith(invoiceDTO, idempotencyKey);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(responseDTO);
@@ -109,11 +96,10 @@ describe('InvoiceController', () => {
       const reqWithoutIdk = {
         ...req,
         headers: {}
-      } as Request;
-      const invoiceDTO = aValidInvoiceRequestDTO();
-      const responseDTO = aValidInvoiceResponseDTO();
+      } as TypedRequest<CreateInvoiceRequestDTO>;
+      const invoiceDTO = aValidCreateInvoiceRequestDTO();
+      const responseDTO = aValidCreateInvoiceResponseDTO();
 
-      mockInfraMapper.map.mockReturnValue(invoiceDTO);
       mockInvoiceHandler.handle.mockReturnValue(responseDTO);
 
       await controller.create(reqWithoutIdk, res);
@@ -121,22 +107,9 @@ describe('InvoiceController', () => {
       expect(mockInvoiceHandler.handle).toHaveBeenCalledWith(invoiceDTO, undefined);
     });
 
-    it('Given mapper throws error, when creating invoice, then should propagate error', async () => {
-      const error = new Error("Invalid request body");
-
-      mockInfraMapper.map.mockImplementation(() => {
-        throw error;
-      });
-
-      await expect(controller.create(req, res)).rejects.toThrow("Invalid request body");
-      expect(mockInvoiceHandler.handle).not.toHaveBeenCalled();
-    });
-
     it('Given handler throws error, when creating invoice, then should propagate error', async () => {
-      const invoiceDTO = aValidInvoiceRequestDTO();
       const error = new Error("Handler error");
 
-      mockInfraMapper.map.mockReturnValue(invoiceDTO);
       mockInvoiceHandler.handle.mockImplementation(() => {
         throw error;
       });

@@ -1,10 +1,10 @@
 import z from "zod";
 
 import { Mapper } from "../../../../../../../framework/Mapper";
-import { InvoiceRequestDTO } from "../../dtos/InvoiceRequestDTO";
+import { CreateInvoiceRequestDTO } from "../../dtos/CreateInvoiceRequestDTO";
 
-export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, InvoiceRequestDTO> {
-  public map(json: unknown): InvoiceRequestDTO {
+export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, CreateInvoiceRequestDTO> {
+  public map(json: unknown): CreateInvoiceRequestDTO {
     const schema = z.object({
       externalId: z.string().min(1).nullable(),
       monto: z.number().positive(),

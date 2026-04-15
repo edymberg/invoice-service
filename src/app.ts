@@ -6,14 +6,18 @@ import { Swagger } from "../framework/Swagger";
 import { GetAfipStatusQuery } from "./business/usecases/GetAfipStatusQuery";
 import { GetInvoiceQuery } from "./business/usecases/GetInvoiceQuery";
 import { IssueInvoiceUseCaseImpl } from "./business/usecases/IssueInvoiceUseCaseImpl";
+import { GetInvoiceHandler } from "./infrastructure/adapters/inbound/handlers/GetInvoiceHandler";
 import { IssueInvoiceHandler } from "./infrastructure/adapters/inbound/handlers/IssueInvoiceHandler";
 import { AfipController } from "./infrastructure/adapters/inbound/http/controllers/AfipController";
 import { HealthController } from "./infrastructure/adapters/inbound/http/controllers/HealthController";
 import { InvoiceController } from "./infrastructure/adapters/inbound/http/controllers/InvoiceController";
 import { SalesPointsController } from "./infrastructure/adapters/inbound/http/controllers/SalesPointsController";
-import { InvoiceRequestDTO } from "./infrastructure/adapters/inbound/http/dtos/InvoiceRequestDTO";
+import { CreateInvoiceRequestDTO } from "./infrastructure/adapters/inbound/http/dtos/CreateInvoiceRequestDTO";
+import { GetInvoiceRequestDTO } from "./infrastructure/adapters/inbound/http/dtos/GetInvoiceRequestDTO";
+import { FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper } from "./infrastructure/adapters/inbound/http/mappers/inbound/FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper";
 import { FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper } from "./infrastructure/adapters/inbound/http/mappers/inbound/FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper";
-import { FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper";
+import { FromGetInvoiceQueryToGetInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromGetInvoiceQueryToGetInvoiceResponseDTOMapper";
+import { FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper";
 import { buildRouter } from "./infrastructure/adapters/inbound/http/routes";
 import { IdempotencyStoreMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/IdempotencyStoreMongoAdapter";
 import { InvoiceRepositoryMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
@@ -44,19 +48,27 @@ export async function buildApp() {
   const afipStatus = new GetAfipStatusQuery(ebillAdapter);
 
   // Mappers
-  const outMapper = new FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper();
-  const inbMapper = new FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper();
+  const issueInvoiceOutMapper = new FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper();
+  const issueInvoiceInbMapper = new FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper();
+  const getInvoiceOutMapper = new FromGetInvoiceQueryToGetInvoiceResponseDTOMapper();
+  const getInvoiceInbMapper = new FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper();
 
   // Handlers
-  const invoiceHandler = new IssueInvoiceHandler(
+  const issueInvoiceHandler = new IssueInvoiceHandler(
     issue,
-    inbMapper,
-    outMapper,
-    null as unknown as MaskedDTO<InvoiceRequestDTO>,
+    issueInvoiceInbMapper,
+    issueInvoiceOutMapper,
+    null as unknown as MaskedDTO<CreateInvoiceRequestDTO>,
+  );
+  const getInvoiceHandler = new GetInvoiceHandler(
+    getInvoice,
+    getInvoiceInbMapper,
+    getInvoiceOutMapper,
+    null as unknown as MaskedDTO<GetInvoiceRequestDTO>,
   );
 
   // Controllers
-  const invoiceController = new InvoiceController(getInvoice, invoiceHandler);
+  const invoiceController = new InvoiceController(getInvoiceHandler, issueInvoiceHandler);
   const afipController = new AfipController(afipStatus);
   const healthController = new HealthController();
   const salesPointsController = new SalesPointsController();

@@ -1,5 +1,5 @@
 import { Response } from "express";
 
-export interface TypedResponse<O> extends Response {
-  json: (body: O) => this;
+export interface TypedResponse<Output> extends Response {
+  json: (body: Output) => this;
 }

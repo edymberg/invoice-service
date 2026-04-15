@@ -4,18 +4,20 @@ import { AfipController } from "./controllers/AfipController";
 import { HealthController } from "./controllers/HealthController";
 import { InvoiceController } from "./controllers/InvoiceController";
 import { SalesPointsController } from "./controllers/SalesPointsController";
+import { FromHttpToGetInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToGetInvoiceRequestDTOMapper";
 import { FromHttpToInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToInvoiceRequestDTOMapper";
 import { authMiddleware } from "./middlewares/auth";
 import { correlationMiddleware } from "./middlewares/correlation";
 import { errorHandler } from "./middlewares/errorHandler";
-import { bodyMapperMiddleware } from "../../../../../framework/bodyMapper";
+import { bodyMapperMiddleware, paramsMapperMiddleware } from "../../../../../framework/bodyMapper";
+import { Swagger } from "../../../../../framework/Swagger";
 
 export function buildRouter(deps: {
   invoiceController: InvoiceController;
   afipController: AfipController;
   healthController: HealthController;
   salesPointsController: SalesPointsController;
-  swagger: any;
+  swagger: Swagger;
 }) {
   const router = Router();
   router.use(correlationMiddleware);
@@ -28,8 +30,13 @@ export function buildRouter(deps: {
     "/invoices",
     bodyMapperMiddleware(new FromHttpToInvoiceRequestDTOMapper()),
     (req, res) => deps.invoiceController.create(req, res),
+    deps.invoiceController.create,
   );
-  router.get("/invoices/:id", (req, res) => deps.invoiceController.get(req, res));
+  router.get(
+    "/invoices/:id",
+    paramsMapperMiddleware(new FromHttpToGetInvoiceRequestDTOMapper()),
+    deps.invoiceController.get,
+  );
   router.get("/afip/status", deps.afipController.status);
 
   router.get("/sales-points", deps.salesPointsController.list);

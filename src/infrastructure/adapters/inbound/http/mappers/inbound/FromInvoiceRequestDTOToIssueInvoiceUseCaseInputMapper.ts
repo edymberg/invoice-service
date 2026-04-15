@@ -5,6 +5,8 @@ import { Day } from "../../../../../../domain/invoice/vo/Day";
 import { Identification, DocumentType } from "../../../../../../domain/invoice/vo/Identification";
 import { InvoiceRequestDTO } from "../../dtos/InvoiceRequestDTO";
 
+// TODO: find a mapstruct like plugin to do this
+
 type RestDTOError = {
   path: string;
   code: string;

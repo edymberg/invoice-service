@@ -1,6 +1,7 @@
+import { Request, Response } from "express";
+
 import { Mapper } from "./Mapper";
 import { UseCaseHandler } from "./UseCaseHandler";
-import { Request, Response } from "express";
 
 export class Controller {
   constructor(

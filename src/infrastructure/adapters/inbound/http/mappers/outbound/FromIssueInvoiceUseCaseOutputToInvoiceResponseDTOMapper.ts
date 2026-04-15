@@ -2,6 +2,8 @@ import { Mapper } from "../../../../../../../framework/Mapper";
 import { IssueInvoiceUseCaseOutput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { InvoiceResponseDTO } from "../../dtos/InvoiceResponseDTO";
 
+// TODO: find a mapstruct like plugin to do this
+
 export class FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper implements Mapper<
   IssueInvoiceUseCaseOutput,
   InvoiceResponseDTO

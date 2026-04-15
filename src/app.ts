@@ -13,7 +13,6 @@ import { InvoiceController } from "./infrastructure/adapters/inbound/http/contro
 import { SalesPointsController } from "./infrastructure/adapters/inbound/http/controllers/SalesPointsController";
 import { InvoiceRequestDTO } from "./infrastructure/adapters/inbound/http/dtos/InvoiceRequestDTO";
 import { FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper } from "./infrastructure/adapters/inbound/http/mappers/inbound/FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper";
-import { FromHttpToInvoiceRequestDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/infra/FromHttpToInvoiceRequestDTOMapper";
 import { FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper";
 import { buildRouter } from "./infrastructure/adapters/inbound/http/routes";
 import { IdempotencyStoreMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/IdempotencyStoreMongoAdapter";
@@ -45,7 +44,6 @@ export async function buildApp() {
   const afipStatus = new GetAfipStatusQuery(ebillAdapter);
 
   // Mappers
-  const infraMapper = new FromHttpToInvoiceRequestDTOMapper();
   const outMapper = new FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper();
   const inbMapper = new FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper();
 
@@ -58,7 +56,7 @@ export async function buildApp() {
   );
 
   // Controllers
-  const invoiceController = new InvoiceController(getInvoice, infraMapper, invoiceHandler);
+  const invoiceController = new InvoiceController(getInvoice, invoiceHandler);
   const afipController = new AfipController(afipStatus);
   const healthController = new HealthController();
   const salesPointsController = new SalesPointsController();

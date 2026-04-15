@@ -1,30 +1,32 @@
 import { Request, Response } from "express";
 
-import { Mapper } from "../../../../../../framework/Mapper";
+import { TypedRequest } from "../../../../../../framework/TypedRequest";
+import { TypedResponse } from "../../../../../../framework/TypedResponse";
 import { UseCaseHandler } from "../../../../../../framework/UseCaseHandler";
 import { GetInvoiceQuery } from "../../../../../business/usecases/GetInvoiceQuery";
-import { InvoiceRequestDTO } from "../dtos/InvoiceRequestDTO";
-import { InvoiceResponseDTO } from "../dtos/InvoiceResponseDTO";
+import { CreateInvoiceRequestDTO, CreateInvoiceResponseDTO } from "../generated/api-types";
 
 export class InvoiceController {
   constructor(
     private readonly getInvoice: GetInvoiceQuery,
-    private readonly infaMapper: Mapper<JSON, InvoiceRequestDTO>,
-    private readonly invoiceHandler: UseCaseHandler<InvoiceRequestDTO, InvoiceResponseDTO>,
+    private readonly invoiceHandler: UseCaseHandler<
+      CreateInvoiceRequestDTO,
+      CreateInvoiceResponseDTO
+    >,
   ) {}
 
-  public async create(req: Request, res: Response) {
-    const body: JSON = req.body;
-    const invoiceDTO: InvoiceRequestDTO = this.infaMapper.map(body);
-    const idk = (req.headers["idempotency-key"] as string) || undefined;
-
-    const invoiceResponseDTO = this.invoiceHandler.handle(invoiceDTO, idk);
-
-    res.status(201).json(invoiceResponseDTO);
+  public async create(
+    req: TypedRequest<CreateInvoiceRequestDTO>,
+    res: TypedResponse<CreateInvoiceResponseDTO>,
+  ) {
+    const dto = req.body;
+    const idempotencyKey = (req.headers["idempotency-key"] as string) || undefined;
+    const result: CreateInvoiceResponseDTO = await this.invoiceHandler.handle(dto, idempotencyKey);
+    res.status(201).json(result);
   }
 
   public async get(req: Request, res: Response) {
-    const inv = await this.getInvoice.execute(req.params.id);
-    res.json(inv);
+    const result = await this.getInvoice.execute(req.params.id);
+    res.json(result);
   }
 }

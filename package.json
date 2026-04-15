@@ -7,9 +7,11 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
+    "prod": "npm run generate:api && npm run build && npm run start",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "test": "jest"
+    "test": "jest",
+    "generate:api": "swagger-typescript-api generate -p ./schemas/openapi.yaml -o ./src/infrastructure/adapters/inbound/http/generated -n api-types.ts --no-client --type-suffix=DTO"
   },
   "dependencies": {
     "@afipsdk/afip.js": "^1.2.2",
@@ -45,6 +47,7 @@
     "eslint-plugin-sonarjs": "4.0.2",
     "eslint-plugin-unicorn": "63.0.0",
     "prettier": "3.8.1",
+    "swagger-typescript-api": "13.6.8",
     "ts-jest": "^29.4.6",
     "ts-node": "10.9.2",
     "ts-node-dev": "^2.0.0",

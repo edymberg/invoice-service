@@ -3,3 +3,6 @@ node_modules/
 .idea/
 .vscode/
 dist/
+
+# Auto-generated files
+src/infrastructure/adapters/inbound/http/generated/

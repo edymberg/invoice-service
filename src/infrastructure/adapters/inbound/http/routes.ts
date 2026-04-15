@@ -7,19 +7,19 @@ import { SalesPointsController } from "./controllers/SalesPointsController";
 import { authMiddleware } from "./middlewares/auth";
 import { correlationMiddleware } from "./middlewares/correlation";
 import { errorHandler } from "./middlewares/errorHandler";
-import { swaggerDocument, swaggerUi } from "./swagger";
 
 export function buildRouter(deps: {
   invoiceController: InvoiceController;
   afipController: AfipController;
   healthController: HealthController;
   salesPointsController: SalesPointsController;
+  swagger: any;
 }) {
   const router = Router();
   router.use(correlationMiddleware);
 
   router.get("/health", deps.healthController.health);
-  router.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  router.use("/api-docs", deps.swagger.serve(), deps.swagger.setup());
 
   router.use(authMiddleware);
   router.post("/invoices", deps.invoiceController.create);

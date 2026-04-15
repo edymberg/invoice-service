@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 
 import { MaskedDTO } from "../framework/MaskedDTO";
+import { Swagger } from "../framework/Swagger";
 import { GetAfipStatusQuery } from "./business/usecases/GetAfipStatusQuery";
 import { GetInvoiceQuery } from "./business/usecases/GetInvoiceQuery";
 import { IssueInvoiceUseCaseImpl } from "./business/usecases/IssueInvoiceUseCaseImpl";
@@ -62,9 +63,18 @@ export async function buildApp() {
   const healthController = new HealthController();
   const salesPointsController = new SalesPointsController();
 
+  // Swagger
+  const swagger = new Swagger();
+
   // Routes
   app.use(
-    buildRouter({ invoiceController, afipController, healthController, salesPointsController }),
+    buildRouter({
+      invoiceController,
+      afipController,
+      healthController,
+      salesPointsController,
+      swagger,
+    }),
   );
   return app;
 }

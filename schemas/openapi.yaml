@@ -18,22 +18,26 @@ components:
   schemas:
     CreateInvoiceRequest:
       type: object
-      required: [monto, concept]
+      required: [monto, concept, pointOfSale]
       properties:
-        externalId: { type: string, description: "Idempotencia" }
+        externalId: { type: string, nullable: true, description: "Idempotencia" }
         monto: { type: number, minimum: 0.01 }
         dni: { type: integer, minimum: 1000000, maximum: 99999999, nullable: true }
+        cuit: { type: integer, minimum: 10000000000, maximum: 99999999999, nullable: true }
         concept:
           type: integer
           enum: [1,2]
         serviceFrom:
-          type: integer
-          description: Fecha desde (yyyymmdd). Requerido si concept=2
+          type: string
+          format: date
+          description: "Fecha desde (YYYY-MM-DD). Requerido si concept=2"
         serviceTo:
-          type: integer
-          description: Fecha hasta (yyyymmdd). Requerido si concept=2
+          type: string
+          format: date
+          description: "Fecha hasta (YYYY-MM-DD). Requerido si concept=2"
         pointOfSale:
           type: integer
+          minimum: 1
           description: "Punto de venta (parametrizado)"
     CreateInvoiceResponse:
       type: object

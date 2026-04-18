@@ -3,6 +3,18 @@ import { IssueInvoiceUseCaseInput } from "../../../../../src/domain/invoice/usec
 import { Invoice } from "../../../../../src/domain/invoice/Invoice";
 import { InvoiceStatus } from "../../../../../src/domain/invoice/vo/InvoiceStatus";
 import { Identification, DocumentType } from "../../../../../src/domain/invoice/vo/Identification";
+import { PinoLoggerFactory } from "../../../../../framework/logging";
+
+jest.mock("../../../../../framework/logging", () => ({
+  PinoLoggerFactory: {
+    getLogger: jest.fn(() => ({
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    })),
+  },
+}));
 
 describe('IssueInvoiceHandler', () => {
   const aValidInput = (): any => ({

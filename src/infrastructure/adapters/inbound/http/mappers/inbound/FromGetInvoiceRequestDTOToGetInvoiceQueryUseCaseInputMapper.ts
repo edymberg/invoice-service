@@ -1,5 +1,5 @@
-import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/DTOValidator";
-import { Mapper } from "../../../../../../../framework/Mapper";
+import { Mapper } from "../../../../../../../framework/hexagonal";
+import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
 import { GetInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/GetInvoice";
 import { GetInvoiceRequestDTO } from "../../dtos/GetInvoiceRequestDTO";
 

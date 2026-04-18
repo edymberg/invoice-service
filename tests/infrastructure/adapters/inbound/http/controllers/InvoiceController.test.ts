@@ -1,5 +1,4 @@
-import { TypedRequest } from "../../../../../../framework/TypedRequest";
-import { TypedResponse } from "../../../../../../framework/TypedResponse";
+import { TypedRequest, TypedResponse } from "../../../../../../framework/http";
 import { InvoiceController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/InvoiceController";
 import { CreateInvoiceRequestDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/CreateInvoiceRequestDTO";
 import { CreateInvoiceResponseDTO } from "../../../../../../src/infrastructure/adapters/inbound/http/dtos/CreateInvoiceResponseDTO";

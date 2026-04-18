@@ -1,8 +1,9 @@
 import cors from "cors";
 import express from "express";
 
-import { MaskedDTO } from "../framework/MaskedDTO";
-import { Swagger } from "../framework/Swagger";
+import { MaskedDTO } from "../framework/hexagonal";
+import { Swagger } from "../framework/http";
+import { PinoLoggerFactory } from "../framework/logging";
 import { GetAfipStatusQuery } from "./business/usecases/GetAfipStatusQuery";
 import { GetInvoiceQuery } from "./business/usecases/GetInvoiceQuery";
 import { IssueInvoiceUseCaseImpl } from "./business/usecases/IssueInvoiceUseCaseImpl";
@@ -30,6 +31,9 @@ export async function buildApp() {
   const app = express();
   app.use(cors());
   app.use(express.json());
+
+  // Logger
+  PinoLoggerFactory.configureLogger(process.env);
 
   // Mongo DB
   const db = await MongoClientProvider.getOrInitDataBase();

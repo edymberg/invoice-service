@@ -33,49 +33,6 @@ function validateArcaEnv(env: string | undefined): ArcaEnvironment {
     : defaultArcaEnv;
 }
 
-export enum LogLevel {
-  TRACE = "trace",
-  DEBUG = "debug",
-  INFO = "info",
-  WARN = "warn",
-  ERROR = "error",
-  FATAL = "fatal",
-}
-function validateLogLevel(level: string | undefined): LogLevel {
-  const defaultLogLevel = LogLevel.INFO;
-  if (!level) {
-    return defaultLogLevel;
-  }
-
-  const validLevels = Object.values(LogLevel);
-  return validLevels.includes(level as LogLevel) ? (level as LogLevel) : defaultLogLevel;
-}
-
-function parseInnerClassesLogLevels(): Record<string, LogLevel> {
-  const innerClassesLevel: Record<string, LogLevel> = {};
-  const prefix = "LOG_LEVEL_";
-
-  Object.keys(process.env).forEach((key) => {
-    if (key.startsWith(prefix) && key !== "LOG_LEVEL") {
-      const className = key
-        .substring(prefix.length)
-        .split("_")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join("");
-
-      const logLevel = validateLogLevel(process.env[key]?.toLowerCase());
-      innerClassesLevel[className] = logLevel;
-    }
-  });
-
-  return innerClassesLevel;
-}
-
-type LogConfig = {
-  rootLevel: LogLevel;
-  innerClassesLevel?: Record<string, LogLevel>;
-};
-
 type EnvironmentVariables = {
   port: number;
   apiKey: string;
@@ -91,7 +48,6 @@ type EnvironmentVariables = {
     cert: string;
     key: string;
   };
-  log: LogConfig;
 };
 
 export const env: EnvironmentVariables = {
@@ -109,8 +65,5 @@ export const env: EnvironmentVariables = {
     cert: process.env.ARCA_CERT ?? "",
     key: process.env.ARCA_KEY ?? "",
   },
-  log: {
-    rootLevel: validateLogLevel(process.env.LOG_LEVEL),
-    innerClassesLevel: parseInnerClassesLogLevels(),
-  },
 };
+// TODO: remove log config

@@ -1,4 +1,4 @@
-import { Mapper } from "../../../../../../../../framework/Mapper";
+import { Mapper } from "../../../../../../../../framework/hexagonal";
 import { CreateVoucherRequest } from "../../../../../../../business/ports/ElectronicBillingPort";
 import { AFIPCreateNextVoucherRequest } from "../../dtos/Afip";
 

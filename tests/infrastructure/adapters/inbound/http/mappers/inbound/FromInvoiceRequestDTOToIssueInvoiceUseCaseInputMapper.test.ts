@@ -3,7 +3,7 @@ import { CreateInvoiceRequestDTO } from "../../../../../../../src/infrastructure
 import { CONCEPT } from "../../../../../../../src/domain/invoice/vo/Concept";
 import { DocumentType, IdentificationBusinessRuleViolation } from "../../../../../../../src/domain/invoice/vo/Identification";
 import { DayDateBusinessRuleViolation } from "../../../../../../../src/domain/invoice/vo/Day";
-import { DTOMappingException } from "../../../../../../../framework/DTOValidator";
+import { DTOMappingException } from "../../../../../../../framework/http";
 
 describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
   const aValidProductsDTO = (): CreateInvoiceRequestDTO => ({

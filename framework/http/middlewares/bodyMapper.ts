@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
-import { Mapper } from "./Mapper";
-import { TypedRequest } from "./TypedRequest";
+// TODO: Review this import, is a dependency from other module. Those modules should be a single module.
+import { Mapper } from "../../hexagonal";
+import { TypedRequest } from "../index";
 
 // T es un tipo generico que representa un DTO.
 // Por cuestiones de simplicidad no se ha generado aun el tipo BodyDTO.

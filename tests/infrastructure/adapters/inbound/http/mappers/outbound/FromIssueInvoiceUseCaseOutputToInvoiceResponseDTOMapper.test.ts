@@ -1,8 +1,8 @@
-import { FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper } from "../../../../../../../src/infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper";
+import { FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper } from "../../../../../../../src/infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper";
 import { Invoice } from "../../../../../../../src/domain/invoice/Invoice";
 import { InvoiceStatus } from "../../../../../../../src/domain/invoice/vo/InvoiceStatus";
 
-describe('FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper', () => {
+describe('FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper', () => {
   const anInvoiceId = (): string => "invoice-123";
   const aCae = (): string => "12345678901234";
   const aCaeExpiration = (): string => "20231231";
@@ -38,10 +38,10 @@ describe('FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper', () => {
 
   const anIssueInvoiceUseCaseOutput = (invoice: Invoice): any => ({ invoice });
 
-  let mapper: FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper;
+  let mapper: FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper;
 
   beforeEach(() => {
-    mapper = new FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper();
+    mapper = new FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper();
   });
 
   it('Given draft invoice, when mapping, then should return response with null AFIP data', () => {

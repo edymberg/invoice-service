@@ -16,6 +16,9 @@ components:
       description: Correlation id para trazabilidad
       schema: { type: string }
   schemas:
+    InvoiceStatus:
+      type: string
+      enum: [Draft, Issuing, Issued, Failed]
     CreateInvoiceRequest:
       type: object
       required: [monto, concept, pointOfSale]
@@ -43,7 +46,26 @@ components:
       type: object
       properties:
         id: { type: string }
-        status: { type: string, enum: [Draft, Issuing, Issued, Failed] }
+        status: { $ref: '#/components/schemas/InvoiceStatus' }
+        cae: { type: string, nullable: true }
+        caeVto: { type: string, nullable: true }
+        voucherNumber: { type: integer, nullable: true }
+    GetInvoiceResponse:
+      type: object
+      properties:
+        id: { type: string }
+        externalId: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/InvoiceStatus' }
+        pointOfSale: { type: integer }
+        voucherType: { type: integer }
+        concept: { type: integer, enum: [1, 2] }
+        documentType: { type: integer }
+        documentNumber: { type: integer }
+        date: { type: string, format: date }
+        amount: { type: number }
+        currency: { type: string }
+        serviceFrom: { type: string, format: date, nullable: true }
+        serviceTo: { type: string, format: date, nullable: true }
         cae: { type: string, nullable: true }
         caeVto: { type: string, nullable: true }
         voucherNumber: { type: integer, nullable: true }
@@ -96,6 +118,9 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GetInvoiceResponse' }
         "404":
           description: No encontrada
 

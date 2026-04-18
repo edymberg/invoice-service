@@ -1,12 +1,14 @@
 import { Mapper } from "../../../../../../../framework/Mapper";
 import { IssueInvoiceUseCaseOutput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
-import { InvoiceResponseDTO } from "../../dtos/InvoiceResponseDTO";
+import { CreateInvoiceResponseDTO } from "../../dtos/CreateInvoiceResponseDTO";
 
-export class FromIssueInvoiceUseCaseOutputToInvoiceResponseDTOMapper implements Mapper<
+// TODO: find a mapstruct like plugin to do this
+
+export class FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper implements Mapper<
   IssueInvoiceUseCaseOutput,
-  InvoiceResponseDTO
+  CreateInvoiceResponseDTO
 > {
-  public map(output: IssueInvoiceUseCaseOutput): InvoiceResponseDTO {
+  public map(output: IssueInvoiceUseCaseOutput): CreateInvoiceResponseDTO {
     return {
       id: output.invoice.id,
       status: output.invoice.status.toString() as "Draft" | "Issuing" | "Issued" | "Failed",

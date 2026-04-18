@@ -1,30 +1,21 @@
+import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/DTOValidator";
 import { Mapper } from "../../../../../../../framework/Mapper";
 import { IssueInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { CONCEPT } from "../../../../../../domain/invoice/vo/Concept";
 import { Day } from "../../../../../../domain/invoice/vo/Day";
 import { Identification, DocumentType } from "../../../../../../domain/invoice/vo/Identification";
-import { InvoiceRequestDTO } from "../../dtos/InvoiceRequestDTO";
+import { CreateInvoiceRequestDTO } from "../../dtos/CreateInvoiceRequestDTO";
 
-type RestDTOError = {
-  path: string;
-  code: string;
-  message: string;
-}[];
+// TODO: find a mapstruct like plugin to do this
 
-export class DTOMappingException extends Error {
-  public readonly restDTOError: RestDTOError;
-
-  constructor(message: string, restDTOError: RestDTOError) {
-    super(message);
-    this.restDTOError = restDTOError;
-  }
-}
-
-export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper implements Mapper<
-  InvoiceRequestDTO,
-  IssueInvoiceUseCaseInput
-> {
-  public map(invoiceDTO: InvoiceRequestDTO, idk: string | undefined): IssueInvoiceUseCaseInput {
+export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper
+  extends AbstractDTOValidator
+  implements Mapper<CreateInvoiceRequestDTO, IssueInvoiceUseCaseInput>
+{
+  public map(
+    invoiceDTO: CreateInvoiceRequestDTO,
+    idk: string | undefined,
+  ): IssueInvoiceUseCaseInput {
     this.validateDTO(invoiceDTO);
 
     const idDocument: Identification = Identification.builder()
@@ -68,7 +59,7 @@ export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper implements Ma
     };
   }
 
-  private validateDTO(invoiceDTO: InvoiceRequestDTO) {
+  protected doValidations(invoiceDTO: CreateInvoiceRequestDTO): RestDTOError {
     const restDTOError: RestDTOError = [];
 
     if (!!invoiceDTO.cuit && !!invoiceDTO.dni) {
@@ -138,8 +129,6 @@ export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper implements Ma
       });
     }
 
-    if (restDTOError.length > 0) {
-      throw new DTOMappingException("There where errors mapping the given DTO", restDTOError);
-    }
+    return restDTOError;
   }
 }

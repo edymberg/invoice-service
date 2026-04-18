@@ -1,8 +1,8 @@
 import { FromHttpToInvoiceRequestDTOMapper } from "../../../../../../../src/infrastructure/adapters/inbound/http/mappers/infra/FromHttpToInvoiceRequestDTOMapper";
-import { InvoiceRequestDTO } from "../../../../../../../src/infrastructure/adapters/inbound/http/dtos/InvoiceRequestDTO";
+import { CreateInvoiceRequestDTO } from "../../../../../../../src/infrastructure/adapters/inbound/http/dtos/CreateInvoiceRequestDTO";
 
 describe('FromHttpToInvoiceRequestDTOMapper', () => {
-  const aValidHttpRequest = (): any => ({
+  const aValidHttpRequest = (): CreateInvoiceRequestDTO => ({
     externalId: "external-123",
     monto: 1000,
     dni: 12345678,
@@ -13,7 +13,7 @@ describe('FromHttpToInvoiceRequestDTOMapper', () => {
     pointOfSale: 1
   });
 
-  const aValidServicesRequest = (): any => ({
+  const aValidServicesRequest = (): CreateInvoiceRequestDTO => ({
     externalId: "external-456",
     monto: 2000,
     dni: null,

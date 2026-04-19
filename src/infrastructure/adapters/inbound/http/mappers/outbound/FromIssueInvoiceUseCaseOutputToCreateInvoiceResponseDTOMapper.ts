@@ -1,4 +1,4 @@
-import { Mapper } from "../../../../../../../framework/Mapper";
+import { Mapper } from "../../../../../../../framework/hexagonal";
 import { IssueInvoiceUseCaseOutput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { CreateInvoiceResponseDTO } from "../../dtos/CreateInvoiceResponseDTO";
 

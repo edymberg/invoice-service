@@ -1,5 +1,5 @@
-import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/DTOValidator";
-import { Mapper } from "../../../../../../../framework/Mapper";
+import { Mapper } from "../../../../../../../framework/hexagonal";
+import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
 import { IssueInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { CONCEPT } from "../../../../../../domain/invoice/vo/Concept";
 import { Day } from "../../../../../../domain/invoice/vo/Day";

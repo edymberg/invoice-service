@@ -9,8 +9,11 @@ import { FromHttpToInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToInv
 import { authMiddleware } from "./middlewares/auth";
 import { correlationMiddleware } from "./middlewares/correlation";
 import { errorHandler } from "./middlewares/errorHandler";
-import { bodyMapperMiddleware, paramsMapperMiddleware } from "../../../../../framework/bodyMapper";
-import { Swagger } from "../../../../../framework/Swagger";
+import {
+  bodyMapperMiddleware,
+  paramsMapperMiddleware,
+  Swagger,
+} from "../../../../../framework/http";
 
 export function buildRouter(deps: {
   invoiceController: InvoiceController;

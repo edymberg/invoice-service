@@ -4,17 +4,16 @@ import { AfipController } from "../../../../../src/infrastructure/adapters/inbou
 import { HealthController } from "../../../../../src/infrastructure/adapters/inbound/http/controllers/HealthController";
 import { InvoiceController } from "../../../../../src/infrastructure/adapters/inbound/http/controllers/InvoiceController";
 import { SalesPointsController } from "../../../../../src/infrastructure/adapters/inbound/http/controllers/SalesPointsController";
-import { Swagger } from "../../../../../framework/Swagger";
 import { correlationMiddleware } from "../../../../../src/infrastructure/adapters/inbound/http/middlewares/correlation";
 import { authMiddleware } from "../../../../../src/infrastructure/adapters/inbound/http/middlewares/auth";
 import { errorHandler } from "../../../../../src/infrastructure/adapters/inbound/http/middlewares/errorHandler";
-import { bodyMapperMiddleware, paramsMapperMiddleware } from "../../../../../framework/bodyMapper";
+import { bodyMapperMiddleware, paramsMapperMiddleware, Swagger } from "../../../../../framework/http";
 
 jest.mock("express");
 jest.mock("../../../../../src/infrastructure/adapters/inbound/http/middlewares/correlation");
 jest.mock("../../../../../src/infrastructure/adapters/inbound/http/middlewares/auth");
 jest.mock("../../../../../src/infrastructure/adapters/inbound/http/middlewares/errorHandler");
-jest.mock("../../../../../framework/bodyMapper");
+jest.mock("../../../../../framework/http/middlewares/bodyMapper");
 
 describe("buildRouter", () => {
   const mockRouter = {

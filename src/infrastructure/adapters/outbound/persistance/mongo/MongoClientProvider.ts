@@ -1,14 +1,16 @@
 import { MongoClient, Db } from "mongodb";
 
+import { PinoLogger, PinoLoggerFactory } from "../../../../../../framework/logging";
 import { env } from "../../../../config/env";
 
 export class MongoClientProvider {
+  private static readonly logger: PinoLogger = PinoLoggerFactory.getLogger("MongoClientProvider");
   // Static instance to avoid having more than one of this.
   private static client: MongoClient;
   private static db: Db;
 
   public static async getOrInitDataBase(): Promise<Db> {
-    console.log(`MongoDB connecting to ${env.mongo.uri}`);
+    this.logger.info(`MongoDB connecting to ${env.mongo.uri}`);
     if (this.db) {
       return this.db;
     }
@@ -23,10 +25,11 @@ export class MongoClientProvider {
     try {
       await this.client.connect();
       return this.client.db(env.mongo.db);
-    } catch {
+    } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.client = null as any;
-      throw new Error("MongoDB connection failed");
+      this.logger.error({ err: error, msg: "MongoDB connection failed" });
+      throw new Error("MongoDB connection failed", { cause: error });
     }
   }
 }

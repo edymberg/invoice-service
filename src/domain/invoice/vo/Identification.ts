@@ -1,4 +1,4 @@
-import { BusinessRuleViolation } from "../../../../framework/BusinessRuleViolation";
+import { BusinessRuleViolation } from "../../../../framework/ddd/BusinessRuleViolation";
 
 export class IdentificationBusinessRuleViolation extends BusinessRuleViolation {
   constructor(message: string) {

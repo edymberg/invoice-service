@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { Mapper } from "../../../../../../../framework/Mapper";
+import { Mapper } from "../../../../../../../framework/hexagonal";
 import { CreateInvoiceRequestDTO } from "../../dtos/CreateInvoiceRequestDTO";
 
 export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, CreateInvoiceRequestDTO> {

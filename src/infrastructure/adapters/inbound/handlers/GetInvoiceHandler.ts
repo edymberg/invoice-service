@@ -1,7 +1,5 @@
-import { Logger, LoggerFactory } from "../../../../../framework/logging/logger";
-import { Mapper } from "../../../../../framework/Mapper";
-import { MaskedDTO } from "../../../../../framework/MaskedDTO";
-import { UseCaseHandler } from "../../../../../framework/UseCaseHandler";
+import { Mapper, MaskedDTO, UseCaseHandler } from "../../../../../framework/hexagonal";
+import { PinoLogger, PinoLoggerFactory } from "../../../../../framework/logging";
 import {
   GetInvoiceUseCase,
   GetInvoiceUseCaseInput,
@@ -9,7 +7,7 @@ import {
 } from "../../../../domain/invoice/usecases/GetInvoice";
 
 export class GetInvoiceHandler<I, O> implements UseCaseHandler<I, O> {
-  private readonly logger: Logger = LoggerFactory.getLogger("GetInvoiceHandler");
+  private readonly logger: PinoLogger = PinoLoggerFactory.getLogger("GetInvoiceHandler");
 
   constructor(
     private readonly useCase: GetInvoiceUseCase,

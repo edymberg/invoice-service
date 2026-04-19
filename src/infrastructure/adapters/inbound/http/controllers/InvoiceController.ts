@@ -1,6 +1,5 @@
-import { TypedRequest } from "../../../../../../framework/TypedRequest";
-import { TypedResponse } from "../../../../../../framework/TypedResponse";
-import { UseCaseHandler } from "../../../../../../framework/UseCaseHandler";
+import { UseCaseHandler } from "../../../../../../framework/hexagonal";
+import { TypedRequest, TypedResponse } from "../../../../../../framework/http";
 import { CreateInvoiceRequestDTO } from "../dtos/CreateInvoiceRequestDTO";
 import { CreateInvoiceResponseDTO } from "../dtos/CreateInvoiceResponseDTO";
 import { GetInvoiceRequestDTO } from "../dtos/GetInvoiceRequestDTO";

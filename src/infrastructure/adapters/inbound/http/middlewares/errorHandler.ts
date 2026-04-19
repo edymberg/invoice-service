@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 
-import { logger } from "../../../../../../framework/logging/logger";
+import { PinoLoggerFactory } from "../../../../../../framework/logging";
 
 // TODO: handle DTOMappingException and Domain Exceptions
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function errorHandler(err: any, req: Request, res: Response) {
+  const logger = PinoLoggerFactory.getLogger("ErrorHandler");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const id = (req as any).correlationId;
   // Sanitizar posible DNI en el mensaje

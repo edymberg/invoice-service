@@ -6,7 +6,7 @@ import { InvoiceStatus } from "./vo/InvoiceStatus";
 import { Money } from "./vo/Money";
 import { PointOfSale } from "./vo/PointOfSale";
 import { VoucherType } from "./vo/VoucherType";
-import { BusinessRuleViolation } from "../../../framework/BusinessRuleViolation";
+import { BusinessRuleViolation } from "../../../framework/ddd/BusinessRuleViolation";
 
 export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
   constructor(message: string) {

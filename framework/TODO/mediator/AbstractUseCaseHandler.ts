@@ -1,8 +1,8 @@
 import { UseCase, UseCaseInput, UseCaseOutput } from "./UseCase";
-import { LoggerFactory, Logger } from "../../logging/logger";
-import { Mapper } from "../../Mapper";
-import { MaskedDTO } from "../../MaskedDTO";
-import { UseCaseHandler } from "../../UseCaseHandler";
+import { Mapper } from "../../hexagonal/Mapper";
+import { MaskedDTO } from "../../hexagonal/MaskedDTO";
+import { UseCaseHandler } from "../../hexagonal/UseCaseHandler";
+import { PinoLoggerFactory, PinoLogger } from "../../logging";
 
 export type InboundDTO<I> = {} & I;
 export type OutboundDTO<O> = {} & O;
@@ -13,7 +13,7 @@ export abstract class AbstractUseCaseHandler<I, O> implements UseCaseHandler<
   InboundDTO<I>,
   OutboundDTO<O>
 > {
-  private readonly logger: Logger = LoggerFactory.getLogger("AbstractUseCaseHandler");
+  private readonly logger: PinoLogger = PinoLoggerFactory.getLogger("AbstractUseCaseHandler");
 
   constructor(
     private readonly useCase: UseCase<UseCaseInput<I>, UseCaseOutput<O>>,

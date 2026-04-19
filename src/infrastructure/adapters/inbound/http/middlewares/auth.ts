@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
-import { logger } from "../../../../../../framework/logging/logger";
+import { PinoLoggerFactory } from "../../../../../../framework/logging";
 import { env } from "../../../../config/env";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  const logger = PinoLoggerFactory.getLogger("AuthMiddleware");
   try {
     const authHeader = req.headers["authorization"];
 

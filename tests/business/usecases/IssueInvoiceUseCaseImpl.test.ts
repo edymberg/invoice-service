@@ -15,7 +15,7 @@ describe('IssueInvoiceUseCaseImpl', () => {
     concept: CONCEPT.PRODUCTS,
     pointOfSale: 1,
     idempotencyKey: "idem-123"
-  });
+  } as IssueInvoiceUseCaseInput);
 
   const aServiceInput = (): IssueInvoiceUseCaseInput => ({
     externalId: "external-456",
@@ -25,7 +25,7 @@ describe('IssueInvoiceUseCaseImpl', () => {
     serviceFrom: Day.builder().day(1).month(6).year(2023).build(),
     serviceTo: Day.builder().day(15).month(6).year(2023).build(),
     pointOfSale: 2
-  });
+  } as IssueInvoiceUseCaseInput);
 
   const mockRepository = {
     save: jest.fn(),

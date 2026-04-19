@@ -1,4 +1,4 @@
-import { Mapper } from "../../../../../../../framework/hexagonal";
+import { Mapper } from "../../../../../../../framework/mediator";
 import { GetInvoiceUseCaseOutput } from "../../../../../../domain/invoice/usecases/GetInvoice";
 import { GetInvoiceResponseDTO } from "../../dtos/GetInvoiceResponseDTO";
 
@@ -34,6 +34,6 @@ export class FromGetInvoiceQueryToGetInvoiceResponseDTOMapper implements Mapper<
       cae: invoice.afip?.cae ?? null,
       caeVto: invoice.afip?.caeExpiration ?? null,
       voucherNumber: invoice.afip?.voucherNumber ?? null,
-    };
+    } as GetInvoiceResponseDTO;
   }
 }

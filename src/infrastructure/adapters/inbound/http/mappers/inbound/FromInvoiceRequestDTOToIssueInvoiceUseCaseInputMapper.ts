@@ -1,5 +1,5 @@
-import { Mapper } from "../../../../../../../framework/hexagonal";
 import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
+import { Mapper } from "../../../../../../../framework/mediator";
 import { IssueInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { CONCEPT } from "../../../../../../domain/invoice/vo/Concept";
 import { Day } from "../../../../../../domain/invoice/vo/Day";
@@ -56,7 +56,7 @@ export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper
       serviceTo,
       pointOfSale: invoiceDTO.pointOfSale,
       idempotencyKey: idk,
-    };
+    } as IssueInvoiceUseCaseInput;
   }
 
   protected doValidations(invoiceDTO: CreateInvoiceRequestDTO): RestDTOError {

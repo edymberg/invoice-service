@@ -1,4 +1,4 @@
-import { Mapper } from "../../../../../../../framework/hexagonal";
+import { Mapper } from "../../../../../../../framework/mediator";
 import { IssueInvoiceUseCaseOutput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { CreateInvoiceResponseDTO } from "../../dtos/CreateInvoiceResponseDTO";
 
@@ -15,6 +15,6 @@ export class FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper imple
       cae: output.invoice.afip?.cae ?? null,
       caeVto: output.invoice.afip?.caeExpiration ?? null,
       voucherNumber: output.invoice.afip?.voucherNumber ?? null,
-    };
+    } as CreateInvoiceResponseDTO;
   }
 }

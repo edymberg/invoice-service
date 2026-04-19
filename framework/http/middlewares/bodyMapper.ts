@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
 // TODO: Review this import, is a dependency from other module. Those modules should be a single module.
-import { Mapper } from "../../hexagonal";
+import { Mapper } from "../../../framework/mediator";
 import { TypedRequest } from "../index";
 
 // T es un tipo generico que representa un DTO.

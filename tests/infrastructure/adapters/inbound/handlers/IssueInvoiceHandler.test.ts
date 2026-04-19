@@ -3,7 +3,7 @@ import { IssueInvoiceUseCaseInput } from "../../../../../src/domain/invoice/usec
 import { Invoice } from "../../../../../src/domain/invoice/Invoice";
 import { InvoiceStatus } from "../../../../../src/domain/invoice/vo/InvoiceStatus";
 import { Identification, DocumentType } from "../../../../../src/domain/invoice/vo/Identification";
-import { PinoLoggerFactory } from "../../../../../framework/logging";
+import { AbstractUseCaseHandler } from "../../../../../framework/mediator";
 
 jest.mock("../../../../../framework/logging", () => ({
   PinoLoggerFactory: {
@@ -28,7 +28,7 @@ describe('IssueInvoiceHandler', () => {
     amount: 1000,
     idDocument: Identification.builder().type(DocumentType.DNI).value(12345678).build(),
     concept: 1
-  });
+  }) as IssueInvoiceUseCaseInput;
 
   const aValidInvoice = (): Invoice => ({
     id: "invoice-123",
@@ -58,7 +58,7 @@ describe('IssueInvoiceHandler', () => {
     mask: jest.fn()
   };
 
-  let handler: IssueInvoiceHandler<any, any>;
+  let handler: AbstractUseCaseHandler<any, any>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -135,7 +135,7 @@ describe('IssueInvoiceHandler', () => {
     await expect(act).rejects.toThrow("Outbound mapping error");
   });
 
-  it('Given no idempotency key, when handling, then should pass undefined to inbound mapper', async () => {
+  it('Given no idempotency key, when handling, then should pass only input to inbound mapper', async () => {
     const input = aValidInput();
     const useCaseInput = aValidUseCaseInput();
     const invoice = aValidInvoice();
@@ -147,6 +147,6 @@ describe('IssueInvoiceHandler', () => {
 
     await handler.handle(input);
 
-    expect(mockInboundMapper.map).toHaveBeenCalledWith(input, undefined);
+    expect(mockInboundMapper.map).toHaveBeenCalledWith(input);
   });
 });

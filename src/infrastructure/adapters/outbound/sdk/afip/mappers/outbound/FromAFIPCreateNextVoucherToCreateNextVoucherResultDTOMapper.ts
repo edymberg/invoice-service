@@ -1,4 +1,4 @@
-import { Mapper } from "../../../../../../../../framework/hexagonal";
+import { Mapper } from "../../../../../../../../framework/mediator";
 import { CreateNextVoucherResult } from "../../../../../../../business/ports/ElectronicBillingPort";
 import { AFIPCreateNextVoucherResponse } from "../../dtos/Afip";
 

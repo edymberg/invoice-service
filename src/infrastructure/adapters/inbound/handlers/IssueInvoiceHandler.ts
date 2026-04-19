@@ -1,25 +1,38 @@
-import { Mapper, MaskedDTO, UseCaseHandler } from "../../../../../framework/hexagonal";
 import { PinoLogger, PinoLoggerFactory } from "../../../../../framework/logging";
 import {
-  IssueInvoiceUseCase,
+  AbstractUseCaseHandler,
+  Args,
+  InboundDTO,
+  Mapper,
+  MaskedDTO,
+  OutboundDTO,
+} from "../../../../../framework/mediator";
+import {
   IssueInvoiceUseCaseInput,
   IssueInvoiceUseCaseOutput,
+  IssueInvoiceUseCase,
 } from "../../../../domain/invoice/usecases/IssueInvoice";
 
-export class IssueInvoiceHandler<I, O> implements UseCaseHandler<I, O> {
+export class IssueInvoiceHandler<
+  I extends InboundDTO,
+  O extends OutboundDTO,
+> extends AbstractUseCaseHandler<I, O> {
   private readonly logger: PinoLogger = PinoLoggerFactory.getLogger("IssueInvoiceHandler");
 
   constructor(
-    private readonly useCase: IssueInvoiceUseCase,
-    private readonly inboundMapper: Mapper<I, IssueInvoiceUseCaseInput>,
-    private readonly outboundMapper: Mapper<IssueInvoiceUseCaseOutput, O>,
-    private readonly maskedDTO: MaskedDTO<I>,
-  ) {}
+    protected readonly useCase: IssueInvoiceUseCase,
+    protected readonly inboundMapper: Mapper<I, IssueInvoiceUseCaseInput>,
+    protected readonly outboundMapper: Mapper<IssueInvoiceUseCaseOutput, O>,
+    protected readonly maskedDTO: MaskedDTO<I>,
+  ) {
+    super(useCase, inboundMapper, outboundMapper, maskedDTO);
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async handle(input: I, args?: any): Promise<O> {
+  protected beforeHandle(input: I, ..._args: Args): void {
     this.logger.debug(`Handling issue invoice request: ${this.maskedDTO.mask(input)}`);
+  }
 
-    return this.outboundMapper.map(await this.useCase.execute(this.inboundMapper.map(input, args)));
+  protected afterHandle(output: O, ..._args: Args): void {
+    this.logger.debug(`Output: ${JSON.stringify(output)}`);
   }
 }

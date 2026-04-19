@@ -1,3 +1,4 @@
+import { UseCase, UseCaseInput, UseCaseOutput } from "../../../../framework/mediator";
 import { Invoice } from "../Invoice";
 import { CONCEPT } from "../vo/Concept";
 import { Day } from "../vo/Day";
@@ -12,11 +13,15 @@ export type IssueInvoiceUseCaseInput = {
   serviceTo?: Day;
   pointOfSale?: number;
   idempotencyKey?: string;
-};
+} & UseCaseInput;
+
 export type IssueInvoiceUseCaseOutput = {
   invoice: Invoice;
-};
+} & UseCaseOutput;
 
-export interface IssueInvoiceUseCase {
+export interface IssueInvoiceUseCase extends UseCase<
+  IssueInvoiceUseCaseInput,
+  IssueInvoiceUseCaseOutput
+> {
   execute(input: IssueInvoiceUseCaseInput): Promise<IssueInvoiceUseCaseOutput>;
 }

@@ -34,6 +34,6 @@ export class FromGetInvoiceQueryToGetInvoiceResponseDTOMapper implements Mapper<
       cae: invoice.afip?.cae ?? null,
       caeVto: invoice.afip?.caeExpiration ?? null,
       voucherNumber: invoice.afip?.voucherNumber ?? null,
-    };
+    } as GetInvoiceResponseDTO;
   }
 }

@@ -14,12 +14,18 @@ import { HealthController } from "./infrastructure/adapters/inbound/http/control
 import { InvoiceController } from "./infrastructure/adapters/inbound/http/controllers/InvoiceController";
 import { SalesPointsController } from "./infrastructure/adapters/inbound/http/controllers/SalesPointsController";
 import { CreateInvoiceRequestDTO } from "./infrastructure/adapters/inbound/http/dtos/CreateInvoiceRequestDTO";
+import { CreateInvoiceResponseDTO } from "./infrastructure/adapters/inbound/http/dtos/CreateInvoiceResponseDTO";
 import { GetInvoiceRequestDTO } from "./infrastructure/adapters/inbound/http/dtos/GetInvoiceRequestDTO";
 import { FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper } from "./infrastructure/adapters/inbound/http/mappers/inbound/FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper";
 import { FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper } from "./infrastructure/adapters/inbound/http/mappers/inbound/FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper";
 import { FromGetInvoiceQueryToGetInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromGetInvoiceQueryToGetInvoiceResponseDTOMapper";
 import { FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper } from "./infrastructure/adapters/inbound/http/mappers/outbound/FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper";
 import { buildRouter } from "./infrastructure/adapters/inbound/http/routes";
+import { CreateInvoiceEventInboundDTO } from "./infrastructure/adapters/inbound/messaging/dtos/CreateInvoiceEventInboundDTO";
+import { CreateInvoiceEventOutboundDTO } from "./infrastructure/adapters/inbound/messaging/dtos/CreateInvoiceEventOutboundDTO";
+import { InvoiceListener } from "./infrastructure/adapters/inbound/messaging/InvoiceListener";
+import { FromEventToUseCaseMapper } from "./infrastructure/adapters/inbound/messaging/mappers/inbound/FromEventToUseCaseMapper";
+import { FromUseCaseToEventMapper } from "./infrastructure/adapters/inbound/messaging/mappers/outbound/FromUseCaseToEventMapper";
 import { IdempotencyStoreMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/IdempotencyStoreMongoAdapter";
 import { InvoiceRepositoryMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
 import { MongoClientProvider } from "./infrastructure/adapters/outbound/persistance/mongo/MongoClientProvider";
@@ -59,13 +65,25 @@ export async function buildApp() {
   const httpGetInvoiceInbMapper = new FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper();
 
   // Handlers
-  const httpIssueInvoiceHandler = new IssueInvoiceHandler(
+  const httpIssueInvoiceHandler = new IssueInvoiceHandler<
+    CreateInvoiceRequestDTO,
+    CreateInvoiceResponseDTO
+  >(
     issue,
     httpIssueInvoiceInbMapper,
     httpIssueInvoiceOutMapper,
     null as unknown as MaskedDTO<CreateInvoiceRequestDTO>,
   );
-  const getInvoiceHandler = new GetInvoiceHandler(
+  const eventIssueInvoiceHandler = new IssueInvoiceHandler<
+    CreateInvoiceEventInboundDTO,
+    CreateInvoiceEventOutboundDTO
+  >(
+    issue,
+    new FromEventToUseCaseMapper(),
+    new FromUseCaseToEventMapper(),
+    null as unknown as MaskedDTO<CreateInvoiceEventInboundDTO>,
+  );
+  const httpGetInvoiceHandler = new GetInvoiceHandler(
     getInvoice,
     httpGetInvoiceInbMapper,
     httpGetInvoiceOutMapper,
@@ -73,10 +91,13 @@ export async function buildApp() {
   );
 
   // Controllers
-  const invoiceController = new InvoiceController(httpIssueInvoiceHandler, getInvoiceHandler);
+  const invoiceController = new InvoiceController(httpIssueInvoiceHandler, httpGetInvoiceHandler);
   const afipController = new AfipController(afipStatus);
   const healthController = new HealthController();
   const salesPointsController = new SalesPointsController();
+
+  // Listeners
+  new InvoiceListener(eventIssueInvoiceHandler);
 
   // Swagger
   const swagger = new Swagger();

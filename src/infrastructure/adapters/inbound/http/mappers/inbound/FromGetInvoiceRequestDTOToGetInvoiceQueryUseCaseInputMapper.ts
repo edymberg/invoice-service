@@ -1,5 +1,5 @@
-import { Mapper } from "../../../../../../../framework/mediator";
 import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
+import { Mapper } from "../../../../../../../framework/mediator";
 import { GetInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/GetInvoice";
 import { GetInvoiceRequestDTO } from "../../dtos/GetInvoiceRequestDTO";
 
@@ -14,7 +14,7 @@ export class FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper
 
     return {
       id: dto.id,
-    };
+    } as GetInvoiceUseCaseInput;
   }
 
   protected doValidations(dto: GetInvoiceRequestDTO) {

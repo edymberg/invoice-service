@@ -11,7 +11,7 @@ describe('FromHttpToInvoiceRequestDTOMapper', () => {
     serviceFrom: "2023-06-01",
     serviceTo: "2023-06-15",
     pointOfSale: 1
-  });
+  } as CreateInvoiceRequestDTO);
 
   const aValidServicesRequest = (): CreateInvoiceRequestDTO => ({
     externalId: "external-456",
@@ -22,7 +22,7 @@ describe('FromHttpToInvoiceRequestDTOMapper', () => {
     serviceFrom: "2023-06-01",
     serviceTo: "2023-06-15",
     pointOfSale: 2
-  });
+  } as CreateInvoiceRequestDTO);
 
   let mapper: FromHttpToInvoiceRequestDTOMapper;
 

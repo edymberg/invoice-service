@@ -1,7 +1,7 @@
 import Afip from "@afipsdk/afip.js";
 
 import { AFIPCreateNextVoucherRequest, AFIPCreateNextVoucherResponse } from "./dtos/Afip";
-import { Mapper } from "../../../../../../framework/hexagonal/Mapper";
+import { Mapper } from "../../../../../../framework/mediator/mappers/Mapper";
 import {
   ElectronicBillingPort,
   CreateVoucherRequest,

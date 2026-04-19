@@ -1,9 +1,9 @@
 import cors from "cors";
 import express from "express";
 
-import { MaskedDTO } from "../framework/hexagonal";
 import { Swagger } from "../framework/http";
 import { PinoLoggerFactory } from "../framework/logging";
+import { MaskedDTO } from "../framework/mediator";
 import { GetAfipStatusQuery } from "./business/usecases/GetAfipStatusQuery";
 import { GetInvoiceQuery } from "./business/usecases/GetInvoiceQuery";
 import { IssueInvoiceUseCaseImpl } from "./business/usecases/IssueInvoiceUseCaseImpl";
@@ -52,27 +52,28 @@ export async function buildApp() {
   const afipStatus = new GetAfipStatusQuery(ebillAdapter);
 
   // Mappers
-  const issueInvoiceOutMapper = new FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper();
-  const issueInvoiceInbMapper = new FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper();
-  const getInvoiceOutMapper = new FromGetInvoiceQueryToGetInvoiceResponseDTOMapper();
-  const getInvoiceInbMapper = new FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper();
+  const httpIssueInvoiceOutMapper =
+    new FromIssueInvoiceUseCaseOutputToCreateInvoiceResponseDTOMapper();
+  const httpIssueInvoiceInbMapper = new FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper();
+  const httpGetInvoiceOutMapper = new FromGetInvoiceQueryToGetInvoiceResponseDTOMapper();
+  const httpGetInvoiceInbMapper = new FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper();
 
   // Handlers
-  const issueInvoiceHandler = new IssueInvoiceHandler(
+  const httpIssueInvoiceHandler = new IssueInvoiceHandler(
     issue,
-    issueInvoiceInbMapper,
-    issueInvoiceOutMapper,
+    httpIssueInvoiceInbMapper,
+    httpIssueInvoiceOutMapper,
     null as unknown as MaskedDTO<CreateInvoiceRequestDTO>,
   );
   const getInvoiceHandler = new GetInvoiceHandler(
     getInvoice,
-    getInvoiceInbMapper,
-    getInvoiceOutMapper,
+    httpGetInvoiceInbMapper,
+    httpGetInvoiceOutMapper,
     null as unknown as MaskedDTO<GetInvoiceRequestDTO>,
   );
 
   // Controllers
-  const invoiceController = new InvoiceController(getInvoiceHandler, issueInvoiceHandler);
+  const invoiceController = new InvoiceController(httpIssueInvoiceHandler, getInvoiceHandler);
   const afipController = new AfipController(afipStatus);
   const healthController = new HealthController();
   const salesPointsController = new SalesPointsController();

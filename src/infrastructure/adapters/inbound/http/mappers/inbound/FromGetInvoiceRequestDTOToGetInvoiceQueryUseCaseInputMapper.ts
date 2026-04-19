@@ -1,4 +1,4 @@
-import { Mapper } from "../../../../../../../framework/hexagonal";
+import { Mapper } from "../../../../../../../framework/mediator";
 import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
 import { GetInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/GetInvoice";
 import { GetInvoiceRequestDTO } from "../../dtos/GetInvoiceRequestDTO";

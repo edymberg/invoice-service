@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { Mapper } from "../../../../../../../framework/hexagonal";
+import { Mapper } from "../../../../../../../framework/mediator";
 import { GetInvoiceRequestDTO } from "../../dtos/GetInvoiceRequestDTO";
 
 export class FromHttpToGetInvoiceRequestDTOMapper implements Mapper<unknown, GetInvoiceRequestDTO> {
@@ -9,6 +9,6 @@ export class FromHttpToGetInvoiceRequestDTOMapper implements Mapper<unknown, Get
       id: z.string().min(1),
     });
 
-    return schema.parse(json);
+    return schema.parse(json) as GetInvoiceRequestDTO;
   }
 }

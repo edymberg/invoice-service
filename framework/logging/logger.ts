@@ -14,7 +14,9 @@ export type LogConfig = {
   innerClassesLevel?: Record<string, LogLevel>;
 };
 
-export type PinoLogger = pino.Logger;
+export type Logger = object; // Base interface for all loggers
+
+export type PinoLogger = pino.Logger & Logger;
 
 export const INNER_CLASSES_LOG_LEVEL_PREFIX: string = "LOG_LEVEL_";
 

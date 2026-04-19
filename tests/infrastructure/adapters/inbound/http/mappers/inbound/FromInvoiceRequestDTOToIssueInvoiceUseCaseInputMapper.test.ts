@@ -15,7 +15,7 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     serviceFrom: undefined,
     serviceTo: undefined,
     pointOfSale: 1
-  });
+  } as CreateInvoiceRequestDTO);
 
   const aValidServicesDTO = (): CreateInvoiceRequestDTO => ({
     externalId: "external-456",
@@ -26,7 +26,7 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     serviceFrom: "2023-06-01",
     serviceTo: "2023-06-15",
     pointOfSale: 2
-  });
+  } as CreateInvoiceRequestDTO);
 
   let mapper: FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper;
 

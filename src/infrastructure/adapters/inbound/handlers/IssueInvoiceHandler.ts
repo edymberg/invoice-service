@@ -1,25 +1,33 @@
-import { Mapper, MaskedDTO, UseCaseHandler } from "../../../../../framework/hexagonal";
 import { PinoLogger, PinoLoggerFactory } from "../../../../../framework/logging";
+import { AbstractUseCaseHandler, Args, Mapper, MaskedDTO } from "../../../../../framework/mediator";
 import {
-  IssueInvoiceUseCase,
   IssueInvoiceUseCaseInput,
   IssueInvoiceUseCaseOutput,
+  IssueInvoiceUseCase,
 } from "../../../../domain/invoice/usecases/IssueInvoice";
+import { CreateInvoiceRequestDTO } from "../http/dtos/CreateInvoiceRequestDTO";
+import { CreateInvoiceResponseDTO } from "../http/dtos/CreateInvoiceResponseDTO";
 
-export class IssueInvoiceHandler<I, O> implements UseCaseHandler<I, O> {
+export class IssueInvoiceHandler extends AbstractUseCaseHandler<
+  CreateInvoiceRequestDTO,
+  CreateInvoiceResponseDTO
+> {
   private readonly logger: PinoLogger = PinoLoggerFactory.getLogger("IssueInvoiceHandler");
 
   constructor(
-    private readonly useCase: IssueInvoiceUseCase,
-    private readonly inboundMapper: Mapper<I, IssueInvoiceUseCaseInput>,
-    private readonly outboundMapper: Mapper<IssueInvoiceUseCaseOutput, O>,
-    private readonly maskedDTO: MaskedDTO<I>,
-  ) {}
+    protected readonly useCase: IssueInvoiceUseCase,
+    protected readonly inboundMapper: Mapper<CreateInvoiceRequestDTO, IssueInvoiceUseCaseInput>,
+    protected readonly outboundMapper: Mapper<IssueInvoiceUseCaseOutput, CreateInvoiceResponseDTO>,
+    protected readonly maskedDTO: MaskedDTO<CreateInvoiceRequestDTO>,
+  ) {
+    super(useCase, inboundMapper, outboundMapper, maskedDTO);
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async handle(input: I, args?: any): Promise<O> {
+  protected beforeHandle(input: CreateInvoiceRequestDTO, ..._args: Args): void {
     this.logger.debug(`Handling issue invoice request: ${this.maskedDTO.mask(input)}`);
+  }
 
-    return this.outboundMapper.map(await this.useCase.execute(this.inboundMapper.map(input, args)));
+  protected afterHandle(output: CreateInvoiceResponseDTO, ..._args: Args): void {
+    this.logger.debug(`Output: ${JSON.stringify(output)}`);
   }
 }

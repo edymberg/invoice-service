@@ -36,7 +36,7 @@ export class IssueInvoiceUseCaseImpl implements IssueInvoiceUseCase {
       if (existed) {
         const inv = await this.repo.findById(existed.invoiceId);
         if (inv) {
-          return { invoice: inv };
+          return { invoice: inv } as IssueInvoiceUseCaseOutput;
         }
       }
     }
@@ -96,7 +96,7 @@ export class IssueInvoiceUseCaseImpl implements IssueInvoiceUseCase {
       if (idemKey) {
         await this.idem.put(idemKey, issuedInv.id);
       }
-      return { invoice: issuedInv };
+      return { invoice: issuedInv } as IssueInvoiceUseCaseOutput;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       const failedInv = issuingInv.markFailed();

@@ -13,7 +13,7 @@ describe('InvoiceController', () => {
     serviceFrom: "2023-06-01",
     serviceTo: "2023-06-15",
     pointOfSale: 1
-  });
+  } as CreateInvoiceRequestDTO);
 
   const aValidCreateInvoiceRequestDTO = (): CreateInvoiceRequestDTO => ({
     externalId: "external-123",
@@ -24,7 +24,7 @@ describe('InvoiceController', () => {
     serviceFrom: "2023-06-01",
     serviceTo: "2023-06-15",
     pointOfSale: 1
-  });
+  } as CreateInvoiceRequestDTO);
 
   const aValidCreateInvoiceResponseDTO = (): CreateInvoiceResponseDTO => ({
     id: "invoice-123",
@@ -32,10 +32,10 @@ describe('InvoiceController', () => {
     cae: "12345678901234",
     caeVto: "20231231",
     voucherNumber: 1
-  });
+  } as CreateInvoiceResponseDTO);
 
   const mockGetInvoice = {
-    execute: jest.fn()
+    handle: jest.fn()
   };
 
   const mockInvoiceHandler = {
@@ -69,8 +69,8 @@ describe('InvoiceController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     controller = new InvoiceController(
-      mockGetInvoice as any,
       mockInvoiceHandler as any,
+      mockGetInvoice as any,
     );
     req = mockRequest();
     res = mockResponse();

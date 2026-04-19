@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { Mapper } from "../../../../../../../framework/hexagonal";
+import { Mapper } from "../../../../../../../framework/mediator";
 import { CreateInvoiceRequestDTO } from "../../dtos/CreateInvoiceRequestDTO";
 
 export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, CreateInvoiceRequestDTO> {
@@ -16,6 +16,6 @@ export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, Create
       pointOfSale: z.number().int().positive(),
     });
 
-    return schema.parse(json);
+    return schema.parse(json) as CreateInvoiceRequestDTO;
   }
 }

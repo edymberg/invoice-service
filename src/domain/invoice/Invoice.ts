@@ -14,6 +14,7 @@ export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
   }
 }
 
+// TODO: extend from ddd/BusinessRule
 interface InvoiceBusinessRule {
   validate(invoice: Invoice): void;
 }

@@ -20,43 +20,7 @@ export type PinoLogger = pino.Logger & Logger;
 
 export const INNER_CLASSES_LOG_LEVEL_PREFIX: string = "LOG_LEVEL_";
 
-export function validateLogLevel(level: string | undefined): LogLevel {
-  const defaultLogLevel = LogLevel.INFO;
-  if (!level) {
-    console.warn("LOG_LEVEL environment variable is not set, using INFO as default");
-    return defaultLogLevel;
-  }
-
-  const validLevels = Object.values(LogLevel);
-  if (!validLevels.includes(level as LogLevel)) {
-    console.warn(`Invalid LOG_LEVEL value: ${level}, using INFO as default`);
-    return defaultLogLevel;
-  }
-  return level as LogLevel;
-}
-
-export function parseInnerClassesLogLevels(env: NodeJS.ProcessEnv): Record<string, LogLevel> {
-  const innerClassesLevel: Record<string, LogLevel> = {};
-
-  const innerClassesLogLevels: string[] = Object.keys(env).filter(
-    (key) => key.startsWith(INNER_CLASSES_LOG_LEVEL_PREFIX) && key !== "LOG_LEVEL",
-  );
-
-  innerClassesLogLevels.forEach((key) => {
-    const className = key
-      .substring(INNER_CLASSES_LOG_LEVEL_PREFIX.length)
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join("");
-    console.warn(`Detected Log Level configuration for inner class: ${className}`);
-
-    const logLevel = validateLogLevel(process.env[key]?.toLowerCase());
-    innerClassesLevel[className] = logLevel;
-  });
-
-  return innerClassesLevel;
-}
-
+// TODO: test that always returns the same logger instance
 export class PinoLoggerFactory {
   private static INNER_CLASSES_LOG_LEVEL_PREFIX: string = "LOG_LEVEL_";
   private static logger: PinoLogger;
@@ -70,7 +34,7 @@ export class PinoLoggerFactory {
     }
 
     const validLevels = Object.values(LogLevel);
-    if (!validLevels.includes(level as LogLevel)) {
+    if (!validLevels.includes(level.toLowerCase() as LogLevel)) {
       console.warn(`Invalid LOG_LEVEL value: ${level}, using INFO as default`);
       return defaultLogLevel;
     }
@@ -90,9 +54,9 @@ export class PinoLoggerFactory {
         .split("_")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join("");
-      console.warn(`Detected Log Level configuration for inner class: ${className}`);
 
       const logLevel = this.validateLogLevel(process.env[key]?.toLowerCase());
+      console.warn(`Detected Log Level ${logLevel} configuration for inner class: ${className}`);
       innerClassesLevel[className] = logLevel;
     });
 

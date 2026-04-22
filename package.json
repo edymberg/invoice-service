@@ -1,12 +1,11 @@
 {
   "name": "arca-invoicing-hex-ddd",
   "version": "1.0.0",
-  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "prod": "npm run generate:api && npm run build && npm run start",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -17,6 +16,7 @@
     "@afipsdk/afip.js": "^1.2.2",
     "cors": "^2.8.5",
     "dayjs": "^1.11.11",
+    "dotenv": "17.4.2",
     "express": "^4.19.2",
     "js-yaml": "4.1.1",
     "mongodb": "^6.5.0",

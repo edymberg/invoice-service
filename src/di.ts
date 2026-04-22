@@ -62,16 +62,19 @@ export async function buildDependencies(): Promise<{
   const httpGetInvoiceOutMapper = new FromGetInvoiceQueryToGetInvoiceResponseDTOMapper();
   const httpGetInvoiceInbMapper = new FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper();
 
+  // Masked DTOs
+  const maskedCreateInvoiceRequestDTO = {
+    mask: (input: CreateInvoiceRequestDTO) => input,
+  } as unknown as MaskedDTO<CreateInvoiceRequestDTO>;
+  const maskedCreateInvoiceEventInboundDTO = {
+    mask: (input: CreateInvoiceEventInboundDTO) => input,
+  } as unknown as MaskedDTO<CreateInvoiceEventInboundDTO>;
+
   // Handlers
   const httpIssueInvoiceHandler = new IssueInvoiceHandler<
     CreateInvoiceRequestDTO,
     CreateInvoiceResponseDTO
-  >(
-    issue,
-    httpIssueInvoiceInbMapper,
-    httpIssueInvoiceOutMapper,
-    null as unknown as MaskedDTO<CreateInvoiceRequestDTO>,
-  );
+  >(issue, httpIssueInvoiceInbMapper, httpIssueInvoiceOutMapper, maskedCreateInvoiceRequestDTO);
   const eventIssueInvoiceHandler = new IssueInvoiceHandler<
     CreateInvoiceEventInboundDTO,
     CreateInvoiceEventOutboundDTO
@@ -79,7 +82,7 @@ export async function buildDependencies(): Promise<{
     issue,
     new FromEventToUseCaseMapper(),
     new FromUseCaseToEventMapper(),
-    null as unknown as MaskedDTO<CreateInvoiceEventInboundDTO>,
+    maskedCreateInvoiceEventInboundDTO,
   );
   const httpGetInvoiceHandler = new GetInvoiceHandler(
     getInvoice,

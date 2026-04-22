@@ -23,6 +23,7 @@ export function buildRouter(deps: {
   swagger: Swagger;
 }) {
   const router = Router();
+
   router.use(correlationMiddleware);
 
   router.get("/health", deps.healthController.health);
@@ -32,17 +33,41 @@ export function buildRouter(deps: {
   router.post(
     "/invoices",
     bodyMapperMiddleware(new FromHttpToInvoiceRequestDTOMapper()),
-    (req, res) => deps.invoiceController.create(req, res),
-    deps.invoiceController.create,
+    // TODO: extraer a parte del framework para ocultar express
+    async (req, res, next) => {
+      try {
+        await deps.invoiceController.create(req, res);
+      } catch (error) {
+        next(error);
+      }
+    },
   );
   router.get(
     "/invoices/:id",
     paramsMapperMiddleware(new FromHttpToGetInvoiceRequestDTOMapper()),
-    deps.invoiceController.get,
+    async (req, res, next) => {
+      try {
+        await deps.invoiceController.get(req, res);
+      } catch (error) {
+        next(error);
+      }
+    },
   );
-  router.get("/afip/status", deps.afipController.status);
+  router.get("/afip/status", async (req, res, next) => {
+    try {
+      await deps.afipController.status(req, res);
+    } catch (error) {
+      next(error);
+    }
+  });
 
-  router.get("/sales-points", deps.salesPointsController.list);
+  router.get("/sales-points", async (req, res, next) => {
+    try {
+      await deps.salesPointsController.list(req, res);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   router.use(errorHandler);
   return router;

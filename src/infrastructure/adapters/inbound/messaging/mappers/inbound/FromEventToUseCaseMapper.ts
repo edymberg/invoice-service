@@ -3,17 +3,17 @@ import { Mapper } from "../../../../../../../framework/mediator";
 import { IssueInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { Day } from "../../../../../../domain/invoice/vo/Day";
 import { Identification, DocumentType } from "../../../../../../domain/invoice/vo/Identification";
-import { CreateInvoiceEventInputDTO } from "../../dtos/CreateInvoiceEventInboundDTO";
+import { CreateInvoiceEventInboundDTO } from "../../dtos/CreateInvoiceEventInboundDTO";
 
 export class FromEventToUseCaseMapper
   extends AbstractDTOValidator
-  implements Mapper<CreateInvoiceEventInputDTO, IssueInvoiceUseCaseInput>
+  implements Mapper<CreateInvoiceEventInboundDTO, IssueInvoiceUseCaseInput>
 {
   protected doValidations(_dto: unknown): RestDTOError {
     return [];
   }
 
-  public map(dto: CreateInvoiceEventInputDTO): IssueInvoiceUseCaseInput {
+  public map(dto: CreateInvoiceEventInboundDTO): IssueInvoiceUseCaseInput {
     this.doValidations(dto);
     return {
       externalId: dto.externalId,

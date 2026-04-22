@@ -10,6 +10,6 @@ export class GetInvoiceQuery implements GetInvoiceUseCase {
 
   async execute(input: GetInvoiceUseCaseInput): Promise<GetInvoiceUseCaseOutput> {
     const invoice = await this.repo.findById(input.id);
-    return { invoice };
+    return { invoice } as GetInvoiceUseCaseOutput;
   }
 }

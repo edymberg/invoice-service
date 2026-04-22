@@ -3,11 +3,18 @@ import { MongoClient, Db } from "mongodb";
 import { PinoLogger, PinoLoggerFactory } from "../../../../../../framework/logging";
 import { env } from "../../../../config/env";
 
+// Static instance to avoid having more than one MongoClient instance.
 export class MongoClientProvider {
-  private static readonly logger: PinoLogger = PinoLoggerFactory.getLogger("MongoClientProvider");
-  // Static instance to avoid having more than one of this.
+  private static _logger: PinoLogger | null = null;
   private static client: MongoClient;
   private static db: Db;
+
+  private static get logger(): PinoLogger {
+    if (!this._logger) {
+      this._logger = PinoLoggerFactory.getLogger("MongoClientProvider");
+    }
+    return this._logger;
+  }
 
   public static async getOrInitDataBase(): Promise<Db> {
     this.logger.info(`MongoDB connecting to ${env.mongo.uri}`);

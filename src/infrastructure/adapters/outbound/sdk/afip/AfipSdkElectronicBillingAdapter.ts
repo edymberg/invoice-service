@@ -30,6 +30,7 @@ export class AfipSdkElectronicBillingAdapter implements ElectronicBillingPort {
   }
 
   async createNextVoucher(data: CreateVoucherRequest): Promise<CreateNextVoucherResult> {
+    // TODO: handle error
     return this.outboundMapper.map(
       await this.afip.ElectronicBilling.createNextVoucher(this.inboundMapper.map(data)),
     );

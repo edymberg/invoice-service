@@ -6,16 +6,23 @@ import { CreateInvoiceRequestDTO } from "../../dtos/CreateInvoiceRequestDTO";
 export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, CreateInvoiceRequestDTO> {
   public map(json: unknown): CreateInvoiceRequestDTO {
     const schema = z.object({
-      externalId: z.string().min(1).nullable(),
+      externalId: z.string().min(1).optional().nullable(),
       monto: z.number().positive(),
-      dni: z.number().int().min(1000000).max(99999999).nullable(),
-      cuit: z.number().int().min(1000000).max(99999999).nullable(),
+      dni: z.number().int().min(1000000).max(99999999).optional().nullable(),
+      cuit: z.number().int().min(10000000000).max(99999999999).optional().nullable(),
       concept: z.union([z.literal(1), z.literal(2)]),
-      serviceFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      serviceTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      serviceFrom: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/)
+        .optional(),
+      serviceTo: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/)
+        .optional(),
       pointOfSale: z.number().int().positive(),
     });
 
+    // TODO: handle ZodError and return DTOValidationException
     return schema.parse(json) as CreateInvoiceRequestDTO;
   }
 }

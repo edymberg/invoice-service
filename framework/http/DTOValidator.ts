@@ -5,6 +5,7 @@ export type RestDTOError = {
 }[];
 
 export class DTOMappingException extends Error {
+  // TODO: rename restDTOError
   public readonly restDTOError: RestDTOError;
 
   constructor(message: string, restDTOError: RestDTOError) {

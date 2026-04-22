@@ -27,12 +27,14 @@ export function paramsMapperMiddleware<T extends Record<string, string>>(
   mapper: Mapper<unknown, T>,
 ): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
+    const logger = PinoLoggerFactory.getLogger("paramsMapperMiddleware");
     try {
       const params: Record<string, string> = req.params;
       const mappedParams: T & Record<string, string> = mapper.map(params);
       req.params = mappedParams;
       next();
     } catch (error) {
+      logger.error({ error }, "Error mapping params");
       next(error);
     }
   };

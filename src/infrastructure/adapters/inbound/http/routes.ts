@@ -4,6 +4,7 @@ import { AfipController } from "./controllers/AfipController";
 import { HealthController } from "./controllers/HealthController";
 import { InvoiceController } from "./controllers/InvoiceController";
 import { SalesPointsController } from "./controllers/SalesPointsController";
+import { GetInvoiceRequestDTO } from "./dtos/GetInvoiceRequestDTO";
 import { FromHttpToGetInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToGetInvoiceRequestDTOMapper";
 import { FromHttpToInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToInvoiceRequestDTOMapper";
 import { authMiddleware } from "./middlewares/auth";
@@ -13,6 +14,7 @@ import {
   bodyMapperMiddleware,
   paramsMapperMiddleware,
   Swagger,
+  TypedRequest,
 } from "../../../../../framework/http";
 
 export function buildRouter(deps: {
@@ -47,7 +49,7 @@ export function buildRouter(deps: {
     paramsMapperMiddleware(new FromHttpToGetInvoiceRequestDTOMapper()),
     async (req, res, next) => {
       try {
-        await deps.invoiceController.get(req, res);
+        await deps.invoiceController.get(req as TypedRequest<null, GetInvoiceRequestDTO>, res);
       } catch (error) {
         next(error);
       }

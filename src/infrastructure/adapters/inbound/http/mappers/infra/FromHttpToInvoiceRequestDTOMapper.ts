@@ -1,9 +1,13 @@
 import z from "zod";
 
+import { DTOMappingException, RestDTOError } from "../../../../../../../framework/http";
+import { PinoLoggerFactory } from "../../../../../../../framework/logging";
 import { Mapper } from "../../../../../../../framework/mediator";
 import { CreateInvoiceRequestDTO } from "../../dtos/CreateInvoiceRequestDTO";
 
 export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, CreateInvoiceRequestDTO> {
+  private readonly logger = PinoLoggerFactory.getLogger("FromHttpToInvoiceRequestDTOMapper");
+
   public map(json: unknown): CreateInvoiceRequestDTO {
     const schema = z.object({
       externalId: z.string().min(1).optional().nullable(),
@@ -23,6 +27,16 @@ export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, Create
     });
 
     // TODO: handle ZodError and return DTOValidationException
-    return schema.parse(json) as CreateInvoiceRequestDTO;
+    try {
+      return schema.parse(json) as CreateInvoiceRequestDTO;
+    } catch (error: any) {
+      const restDTOError: RestDTOError = error.issues.map((e: any) => ({
+        path: e.path[0],
+        code: e.code,
+        message: e.message,
+      }));
+      this.logger.error({ error }, "Error mapping request body");
+      throw new DTOMappingException("Invalid request body", restDTOError);
+    }
   }
 }

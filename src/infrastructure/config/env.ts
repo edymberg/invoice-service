@@ -1,20 +1,4 @@
-enum NodeEnvironment {
-  LOCAL = "local",
-  DEV = "dev",
-  STG = "stg",
-  PROD = "prod",
-}
-function validateNodeEnv(env: string | undefined): NodeEnvironment {
-  const defaultNodeEnv = NodeEnvironment.LOCAL;
-  if (!env) {
-    return defaultNodeEnv;
-  }
-
-  const validEnvironments = Object.values(NodeEnvironment);
-  return validEnvironments.includes(env as NodeEnvironment)
-    ? (env as NodeEnvironment)
-    : defaultNodeEnv;
-}
+import { EnvironmentVariables, buildEnvironmentVariables } from "../../../framework/config";
 
 enum ArcaEnvironment {
   LOCAL = "local",
@@ -33,10 +17,8 @@ function validateArcaEnv(env: string | undefined): ArcaEnvironment {
     : defaultArcaEnv;
 }
 
-type EnvironmentVariables = {
-  port: number;
+export type InvoiceServiceConfig = EnvironmentVariables & {
   apiKey: string;
-  nodeEnv: NodeEnvironment;
   mongo: {
     uri: string;
     db: string;
@@ -50,20 +32,22 @@ type EnvironmentVariables = {
   };
 };
 
-export const env: EnvironmentVariables = {
-  port: parseInt(process.env.PORT ?? "3000", 10),
-  apiKey: process.env.API_KEY ?? "",
-  nodeEnv: validateNodeEnv(process.env.NODE_ENV),
-  mongo: {
-    uri: process.env.MONGO_URI ?? "mongodb://localhost:27017",
-    db: process.env.MONGO_DB ?? "invoicing",
-  },
-  arca: {
-    environment: validateArcaEnv(process.env.ARCA_ENV),
-    accessToken: process.env.ARCA_ACCESS_TOKEN ?? "",
-    cuit: parseInt(process.env.ARCA_CUIT ?? "20409378472", 10),
-    cert: process.env.ARCA_CERT ?? "",
-    key: process.env.ARCA_KEY ?? "",
-  },
-};
-// TODO: remove log config
+function buildInvoiceServiceConfig(): InvoiceServiceConfig {
+  return {
+    ...buildEnvironmentVariables(),
+    apiKey: process.env.API_KEY ?? "your_api_key_here",
+    mongo: {
+      uri: process.env.MONGO_URI ?? "mongodb://localhost:27017",
+      db: process.env.MONGO_DB ?? "invoicing",
+    },
+    arca: {
+      environment: validateArcaEnv(process.env.ARCA_ENV),
+      accessToken: process.env.ARCA_ACCESS_TOKEN ?? "",
+      cuit: parseInt(process.env.ARCA_CUIT ?? "20409378472", 10),
+      cert: process.env.ARCA_CERT ?? "",
+      key: process.env.ARCA_KEY ?? "",
+    },
+  };
+}
+
+export { buildInvoiceServiceConfig };

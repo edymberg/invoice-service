@@ -28,8 +28,9 @@ import { MongoClientProvider } from "./infrastructure/adapters/outbound/persista
 import { AfipSdkElectronicBillingAdapter } from "./infrastructure/adapters/outbound/sdk/afip/AfipSdkElectronicBillingAdapter";
 import { FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper } from "./infrastructure/adapters/outbound/sdk/afip/mappers/inbound/FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper";
 import { FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper } from "./infrastructure/adapters/outbound/sdk/afip/mappers/outbound/FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper";
+import { InvoiceServiceConfig } from "./infrastructure/config/env";
 
-export async function buildDependencies(): Promise<{
+export async function buildDependencies(invoiceServiceConfig: InvoiceServiceConfig): Promise<{
   invoiceController: InvoiceController;
   afipController: AfipController;
   healthController: HealthController;
@@ -37,15 +38,16 @@ export async function buildDependencies(): Promise<{
   swagger: Swagger;
 }> {
   // Logger
-  PinoLoggerFactory.configureLogger(process.env);
+  PinoLoggerFactory.configureLogger(invoiceServiceConfig);
 
   // Mongo DB
-  const db = await MongoClientProvider.getOrInitDataBase();
+  const db = await MongoClientProvider.getOrInitDataBase(invoiceServiceConfig);
 
   // Adapters
   const invoiceRepo = new InvoiceRepositoryMongoAdapter(db);
   const idemStore = new IdempotencyStoreMongoAdapter(db);
   const ebillAdapter = new AfipSdkElectronicBillingAdapter(
+    invoiceServiceConfig,
     new FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper(),
     new FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper(),
   );

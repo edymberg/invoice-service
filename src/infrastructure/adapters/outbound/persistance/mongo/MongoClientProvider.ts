@@ -1,7 +1,7 @@
 import { MongoClient, Db } from "mongodb";
 
 import { PinoLogger, PinoLoggerFactory } from "../../../../../../framework/logging";
-import { env } from "../../../../config/env";
+import { InvoiceServiceConfig } from "../../../../config/env";
 
 // Static instance to avoid having more than one MongoClient instance.
 export class MongoClientProvider {
@@ -16,22 +16,22 @@ export class MongoClientProvider {
     return this._logger;
   }
 
-  public static async getOrInitDataBase(): Promise<Db> {
-    this.logger.info(`MongoDB connecting to ${env.mongo.uri}`);
+  public static async getOrInitDataBase(config: InvoiceServiceConfig): Promise<Db> {
+    this.logger.info(`MongoDB connecting to ${config.mongo.uri}`);
     if (this.db) {
       return this.db;
     }
 
-    this.client = this.client || new MongoClient(env.mongo.uri);
-    this.db = await this.connect();
+    this.client = this.client || new MongoClient(config.mongo.uri);
+    this.db = await this.connect(config);
 
     return this.db;
   }
 
-  private static async connect(): Promise<Db> {
+  private static async connect(config: InvoiceServiceConfig): Promise<Db> {
     try {
       await this.client.connect();
-      return this.client.db(env.mongo.db);
+      return this.client.db(config.mongo.db);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.client = null as any;

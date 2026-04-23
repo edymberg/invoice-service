@@ -3,9 +3,13 @@ import fs from "node:fs";
 import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 
+import { PinoLogger, PinoLoggerFactory } from "../logging";
+
 export class Swagger {
   public static EXPECTED_OPENAPI_PATH = "schemas/openapi.yaml";
-  private swaggerDocument: swaggerUi.JsonObject;
+
+  private readonly logger: PinoLogger = PinoLoggerFactory.getLogger("Swagger");
+  private readonly swaggerDocument: swaggerUi.JsonObject;
 
   constructor() {
     const resolvedPath = path.join(process.cwd(), Swagger.EXPECTED_OPENAPI_PATH);
@@ -21,7 +25,7 @@ export class Swagger {
 
     const openapiYaml = fs.readFileSync(resolvedPath, "utf8");
     this.swaggerDocument = yaml.load(openapiYaml) as swaggerUi.JsonObject;
-    console.log("Swagger UI loaded at: http://localhost:3000/api-docs");
+    this.logger.info("Swagger UI loaded at: http://localhost:3000/api-docs");
   }
 
   public serve() {

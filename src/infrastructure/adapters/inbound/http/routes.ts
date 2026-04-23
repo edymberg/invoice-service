@@ -7,7 +7,7 @@ import { SalesPointsController } from "./controllers/SalesPointsController";
 import { GetInvoiceRequestDTO } from "./dtos/GetInvoiceRequestDTO";
 import { FromHttpToGetInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToGetInvoiceRequestDTOMapper";
 import { FromHttpToInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToInvoiceRequestDTOMapper";
-import { authMiddleware } from "./middlewares/auth";
+import { authMiddlewareFactory } from "./middlewares/auth";
 import { correlationMiddleware } from "./middlewares/correlation";
 import { errorHandler } from "./middlewares/errorHandler";
 import {
@@ -16,14 +16,18 @@ import {
   Swagger,
   TypedRequest,
 } from "../../../../../framework/http";
+import { InvoiceServiceConfig } from "../../../config/env";
 
-export function buildRouter(deps: {
-  invoiceController: InvoiceController;
-  afipController: AfipController;
-  healthController: HealthController;
-  salesPointsController: SalesPointsController;
-  swagger: Swagger;
-}) {
+export function buildRouter(
+  deps: {
+    invoiceController: InvoiceController;
+    afipController: AfipController;
+    healthController: HealthController;
+    salesPointsController: SalesPointsController;
+    swagger: Swagger;
+  },
+  invoiceServiceConfig: InvoiceServiceConfig,
+) {
   const router = Router();
 
   router.use(correlationMiddleware);
@@ -31,7 +35,7 @@ export function buildRouter(deps: {
   router.get("/health", deps.healthController.health);
   router.use("/api-docs", deps.swagger.serve(), deps.swagger.setup());
 
-  router.use(authMiddleware);
+  router.use(authMiddlewareFactory(invoiceServiceConfig));
   router.post(
     "/invoices",
     bodyMapperMiddleware(new FromHttpToInvoiceRequestDTOMapper()),

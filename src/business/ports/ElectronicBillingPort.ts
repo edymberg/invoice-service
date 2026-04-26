@@ -29,5 +29,5 @@ export type CreateNextVoucherResult = {
 export interface ElectronicBillingPort {
   createNextVoucher(data: CreateVoucherRequest): Promise<CreateNextVoucherResult>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getServerStatus(): Promise<any>;
+  getServerStatus(): Promise<any>; // TODO: extract type
 }

@@ -33,7 +33,7 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
 
   // Handle generic errors
   const msg = (err?.message ?? "Internal Server Error").replace(/\b(\d{4,8})\b/g, "***");
-  logger.error({ err: { ...err, message: msg }, correlationId: id }, "Unhandled error");
+  logger.error({ err: { ...err, message: msg, stack: err.stack }, correlationId: id }, "Unhandled error");
   const status = err.statusCode ?? 500;
   res.status(status).json({ error: msg, correlationId: id });
 }

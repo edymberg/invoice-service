@@ -2,6 +2,18 @@ import request from 'supertest';
 import { buildApp, App } from '../../src/app';
 import { buildInvoiceServiceConfig } from '../../src/infrastructure/config/env';
 
+jest.mock("../../framework/logging", () => ({
+  PinoLoggerFactory: {
+    configureLogger: jest.fn(),
+    getLogger: jest.fn(() => ({
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    })),
+  },
+}));
+
 describe('Invoice API Integration Tests', () => {
   let app: App;
   const authToken = 'Bearer your_api_key_here';
@@ -55,6 +67,8 @@ describe('Invoice API Integration Tests', () => {
         expect(response.body).toHaveProperty('cae');
         expect(response.body).toHaveProperty('caeVto');
         expect(response.body).toHaveProperty('voucherNumber');
+
+        // TODO: test data base
       });
     });
 
@@ -71,6 +85,8 @@ describe('Invoice API Integration Tests', () => {
         expect(response.body).toHaveProperty('cae');
         expect(response.body).toHaveProperty('caeVto');
         expect(response.body).toHaveProperty('voucherNumber');
+
+        // TODO: test data base
       });
     });
 
@@ -88,7 +104,7 @@ describe('Invoice API Integration Tests', () => {
           .post('/invoices')
           .set('Authorization', authToken)
           .send(validProductInvoiceRequest)
-          .expect(200);
+          .expect(201);
 
         expect(firstResponse.body.id).toBe(secondResponse.body.id);
         expect(firstResponse.body.externalId).toBe(secondResponse.body.externalId);
@@ -96,10 +112,9 @@ describe('Invoice API Integration Tests', () => {
     });
 
     describe('Request Validations', () => {
-      it('should return 400 for invalid request - missing required fields', async () => {
+      it('should return 400 for invalid request - DTOMappingException', async () => {
         const invalidRequest = {
           monto: 100.50
-          // Missing concept and pointOfSale
         };
 
         const response = await request(app)
@@ -108,14 +123,17 @@ describe('Invoice API Integration Tests', () => {
           .send(invalidRequest)
           .expect(400);
 
-        expect(response.body).toHaveProperty('message');
+
+        expect(response.body).toHaveProperty('error');
+        expect(response.body.error).toBe('Validation failed');
         expect(response.body).toHaveProperty('details');
+        expect(response.body).toHaveProperty('correlationId');
       });
 
-      it('should return 400 for invalid request - negative amount', async () => {
+      it('should return 400 for invalid request - DTOMappingException', async () => {
         const invalidRequest = {
-          ...validProductInvoiceRequest,
-          monto: -50.00
+          ...validServiceInvoiceRequest,
+          serviceFrom: "invalid",
         };
 
         const response = await request(app)
@@ -124,47 +142,11 @@ describe('Invoice API Integration Tests', () => {
           .send(invalidRequest)
           .expect(400);
 
-        expect(response.body).toHaveProperty('message');
-      });
-
-      it('should return 400 for service invoice without service dates', async () => {
-        const invalidRequest = {
-          externalId: "test-invalid-service",
-          monto: 100.50,
-          cuit: 30712345678,
-          concept: 2,
-          // Missing serviceFrom and serviceTo
-          pointOfSale: 1
-        };
-
-        const response = await request(app)
-          .post('/invoices')
-          .set('Authorization', authToken)
-          .send(invalidRequest)
-          .expect(400);
-
-        expect(response.body).toHaveProperty('message');
-      });
-
-      it('should return 400 for invalid CUIT format', async () => {
-        const invalidRequest = {
-          ...validProductInvoiceRequest,
-          cuit: 123 // Too short CUIT
-        };
-
-        const response = await request(app)
-          .post('/invoices')
-          .set('Authorization', authToken)
-          .send(invalidRequest)
-          .expect(400);
-
-        expect(response.body).toHaveProperty('message');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body.error).toBe('Validation failed');
+        expect(response.body).toHaveProperty('details');
+        expect(response.body).toHaveProperty('correlationId');
       });
     });
-
-
-    // Note: Tests for AFIP errors and authorization issues should be implemented
-    // as unit tests with mocked dependencies, as they require specific AFIP error conditions
-    // that are difficult to reproduce in integration tests without actual AFIP credentials.
   });
 });

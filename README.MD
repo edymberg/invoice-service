@@ -9,13 +9,7 @@ npm ci
 
 ## Setup
 
-### 1. Start Dependencies
-
-```bash
-docker-compose up -d
-```
-
-### 2. Configure Environment
+### 1. Configure Environment
 
 Copy the example environment file and configure it:
 
@@ -28,6 +22,12 @@ Edit `.env` with your values:
 - `ARCA_ACCESS_TOKEN`: ARCA/AFIP access token
 - `ARCA_CUIT`: Your CUIT
 
+### 2. Start Dependencies
+
+```bash
+docker-compose up -d
+```
+
 ### 3. Run Development Server
 
 ```bash
@@ -35,6 +35,16 @@ npm run dev
 ```
 
 The server will start on port 3000 (or the port specified in `.env`).
+
+### Troubleshooting
+
+1. Testing issues: If you got a different DEFAULT version of Node.js on your terminal than the one specified in `.nvmrc`, run:
+
+```bash
+nvm alias default $(cat .nvmrc)
+```
+IF the error persists, checko .zshrc or .bash_profile to see the configuration for NVM
+
 
 ## API Documentation
 

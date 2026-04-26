@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/src/index.js",
-    "prod": "npm run generate:api && npm run build && npm run start",
+    "dev": "npm run generate:api && tsx watch src/index.ts",
+    "build": "npm run generate:api && tsc -p tsconfig.json",
+    "prod": "npm run build && node dist/src/index.js",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest",

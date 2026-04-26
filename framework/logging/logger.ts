@@ -13,12 +13,11 @@ export class PinoLoggerFactory {
 
   static configureLogger(env: EnvironmentVariables): void {
     this.config = { ...env.log };
-    this.logger = pino({ level: this.config.rootLevel, base: null }) as PinoLogger;
+    this.logger = pino({ level: this.config.rootLevel.toLowerCase(), base: null }) as PinoLogger;
   }
 
   static getLogger(className: string): PinoLogger {
     const level = this.config.innerClassesLevel?.[className] ?? this.config.rootLevel;
-
-    return PinoLoggerFactory.logger.child({ class: className, level });
+    return PinoLoggerFactory.logger.child({ class: className }, { level: level.toLowerCase() });
   }
 }

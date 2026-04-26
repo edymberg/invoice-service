@@ -51,7 +51,8 @@ function parseInnerClassesLogLevels(env: NodeJS.ProcessEnv): Record<string, LogL
 }
 
 /** NODE ENV */
-enum NodeEnvironment {
+export enum NodeEnvironment {
+  TEST = "test",
   LOCAL = "local",
   DEV = "dev",
   STG = "stg",
@@ -67,6 +68,10 @@ function validateNodeEnv(env: string | undefined): NodeEnvironment {
   return validEnvironments.includes(env as NodeEnvironment)
     ? (env as NodeEnvironment)
     : defaultNodeEnv;
+}
+
+export function isEnv(env: NodeEnvironment): boolean {
+  return process.env.NODE_ENV === env;
 }
 
 /** ENV */

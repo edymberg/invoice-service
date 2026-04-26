@@ -7,7 +7,7 @@ jest.mock("../../../../../../../../framework/logging", () => ({
       debug: jest.fn(),
       info: jest.fn(),
       warn: jest.fn(),
-      error: jest.fn(console.log),
+      error: jest.fn(),
     })),
   },
 }));

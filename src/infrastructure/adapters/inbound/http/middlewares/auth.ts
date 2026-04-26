@@ -10,12 +10,14 @@ export const authMiddlewareFactory = (invoiceServiceConfig: InvoiceServiceConfig
       const authHeader = req.headers["authorization"];
 
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        logger.warn("Auth middleware detected unauthorized request");
         res.status(401).json({ error: "Unauthorized" });
         return;
       }
 
       const token = authHeader.substring("Bearer ".length);
       if (token !== invoiceServiceConfig.apiKey) {
+        logger.warn("Auth middleware detected unauthorized request");
         res.status(401).json({ error: "Unauthorized" });
         return;
       }

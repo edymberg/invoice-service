@@ -5,9 +5,10 @@ import { HealthController } from "../../../../../../src/infrastructure/adapters/
 import { InvoiceController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/InvoiceController";
 import { SalesPointsController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/SalesPointsController";
 import { correlationMiddleware } from "../../../../../../src/infrastructure/adapters/inbound/http/middlewares/correlation";
-import { authMiddleware } from "../../../../../../src/infrastructure/adapters/inbound/http/middlewares/auth";
+import { authMiddlewareFactory } from "../../../../../../src/infrastructure/adapters/inbound/http/middlewares/auth";
 import { errorHandler } from "../../../../../../src/infrastructure/adapters/inbound/http/middlewares/errorHandler";
 import { bodyMapperMiddleware, paramsMapperMiddleware, Swagger } from "../../../../../../framework/http";
+import { InvoiceServiceConfig } from "../../../../../../src/infrastructure/config/env";
 
 jest.mock("express");
 jest.mock("../../../../../../src/infrastructure/adapters/inbound/http/middlewares/correlation");
@@ -70,7 +71,7 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should return a router instance", () => {
     const deps = buildDependencies();
 
-    const result = buildRouter(deps);
+    const result = buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(Router).toHaveBeenCalled();
     expect(result).toBe(mockRouter);
@@ -79,7 +80,7 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register correlation middleware first", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.use).toHaveBeenCalledWith(correlationMiddleware);
     expect(mockRouter.use).toHaveBeenCalledTimes(4);
@@ -88,7 +89,7 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register health endpoint without auth", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.get).toHaveBeenCalledWith("/health", deps.healthController.health);
   });
@@ -96,7 +97,7 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register swagger documentation endpoint", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.use).toHaveBeenCalledWith("/api-docs", expect.any(Function), expect.any(Function));
     expect(deps.swagger.serve).toHaveBeenCalled();
@@ -106,9 +107,9 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register auth middleware before protected routes", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
-    expect(mockRouter.use).toHaveBeenCalledWith(authMiddleware);
+    expect(mockRouter.use).toHaveBeenCalledWith(authMiddlewareFactory({} as InvoiceServiceConfig));
   });
 
   it("Given valid dependencies, when building router, then it should register POST invoices endpoint with body mapper", () => {
@@ -116,7 +117,7 @@ describe("buildRouter", () => {
     const mockBodyMapper = jest.fn();
     (bodyMapperMiddleware as jest.Mock).mockReturnValue(mockBodyMapper);
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.post).toHaveBeenCalledWith(
       "/invoices",
@@ -131,7 +132,7 @@ describe("buildRouter", () => {
     const mockParamsMapper = jest.fn();
     (paramsMapperMiddleware as jest.Mock).mockReturnValue(mockParamsMapper);
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.get).toHaveBeenCalledWith(
       "/invoices/:id",
@@ -144,7 +145,7 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register AFIP status endpoint", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.get).toHaveBeenCalledWith("/afip/status", expect.any(Function));
   });
@@ -152,7 +153,7 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register sales points endpoint", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.get).toHaveBeenCalledWith("/sales-points", expect.any(Function));
   });
@@ -160,7 +161,7 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register error handler middleware last", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     expect(mockRouter.use).toHaveBeenCalledWith(errorHandler);
     const lastCall = mockRouter.use.mock.calls[mockRouter.use.mock.calls.length - 1];
@@ -170,12 +171,12 @@ describe("buildRouter", () => {
   it("Given valid dependencies, when building router, then it should register all endpoints in correct order", () => {
     const deps = buildDependencies();
 
-    buildRouter(deps);
+    buildRouter(deps, {} as InvoiceServiceConfig);
 
     const useCalls = mockRouter.use.mock.calls;
     expect(useCalls[0][0]).toBe(correlationMiddleware);
     expect(useCalls[1][0]).toBe("/api-docs");
-    expect(useCalls[2][0]).toBe(authMiddleware);
+    expect(useCalls[2][0]).toBe(authMiddlewareFactory({} as InvoiceServiceConfig));
     expect(useCalls[3][0]).toBe(errorHandler);
   });
 });

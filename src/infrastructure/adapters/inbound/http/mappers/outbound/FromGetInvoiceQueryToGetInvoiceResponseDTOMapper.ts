@@ -1,6 +1,7 @@
 import { Mapper } from "../../../../../../../framework/mediator";
 import { GetInvoiceUseCaseOutput } from "../../../../../../domain/invoice/usecases/GetInvoice";
 import { GetInvoiceResponseDTO } from "../../dtos/GetInvoiceResponseDTO";
+import { InvoiceStatusDTO } from "../../generated/api-types";
 
 // TODO: find a mapstruct like plugin to do this
 
@@ -16,7 +17,7 @@ export class FromGetInvoiceQueryToGetInvoiceResponseDTOMapper implements Mapper<
     return {
       id: invoice.id,
       externalId: invoice.externalId ?? null,
-      status: invoice.status,
+      status: invoice.status as unknown as InvoiceStatusDTO,
       pointOfSale: invoice.pointOfSaleValue(),
       voucherType: invoice.voucherType,
       concept: invoice.conceptValue(),

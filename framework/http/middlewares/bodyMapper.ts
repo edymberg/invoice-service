@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
 // TODO: Review this import, is a dependency from other module. Those modules should be a single module.
+import { PinoLoggerFactory } from "../../../framework/logging";
 import { Mapper } from "../../../framework/mediator";
 import { TypedRequest } from "../index";
 
 // T es un tipo generico que representa un DTO.
 // Por cuestiones de simplicidad no se ha generado aun el tipo BodyDTO.
 export function bodyMapperMiddleware<T>(mapper: Mapper<unknown, T>): RequestHandler {
+  const logger = PinoLoggerFactory.getLogger("BodyMapperMiddleware");
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const body: TypedRequest = req.body;
@@ -14,6 +16,7 @@ export function bodyMapperMiddleware<T>(mapper: Mapper<unknown, T>): RequestHand
       req.body = mappedBody;
       next();
     } catch (error) {
+      logger.error({ error }, "Error mapping body");
       next(error);
     }
   };
@@ -24,12 +27,14 @@ export function paramsMapperMiddleware<T extends Record<string, string>>(
   mapper: Mapper<unknown, T>,
 ): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
+    const logger = PinoLoggerFactory.getLogger("paramsMapperMiddleware");
     try {
       const params: Record<string, string> = req.params;
       const mappedParams: T & Record<string, string> = mapper.map(params);
       req.params = mappedParams;
       next();
     } catch (error) {
+      logger.error({ error }, "Error mapping params");
       next(error);
     }
   };

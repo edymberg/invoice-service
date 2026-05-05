@@ -7,29 +7,32 @@ import {
   CreateVoucherRequest,
   CreateNextVoucherResult,
 } from "../../../../../business/ports/ElectronicBillingPort";
-import { env } from "../../../../config/env";
+import { InvoiceServiceConfig } from "../../../../config/env";
 
 export class AfipSdkElectronicBillingAdapter implements ElectronicBillingPort {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private afip: any;
 
   constructor(
+    private config: InvoiceServiceConfig,
     private inboundMapper: Mapper<CreateVoucherRequest, AFIPCreateNextVoucherRequest>,
     private outboundMapper: Mapper<AFIPCreateNextVoucherResponse, CreateNextVoucherResult>,
   ) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const baseConfig: any = { CUIT: env.arca.cuit };
-    if (env.arca.environment === "dev") {
-      baseConfig.access_token = env.arca.accessToken; // modo dev
+    const baseConfig: any = { CUIT: this.config.arca.cuit };
+    // TODO: should be moved to a factory
+    if (config.arca.environment === "dev") {
+      baseConfig.access_token = config.arca.accessToken; // modo dev
     } else {
-      baseConfig.cert = env.arca.cert;
-      baseConfig.key = env.arca.key;
+      baseConfig.cert = config.arca.cert;
+      baseConfig.key = config.arca.key;
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.afip = new (Afip as any)(baseConfig);
   }
 
   async createNextVoucher(data: CreateVoucherRequest): Promise<CreateNextVoucherResult> {
+    // TODO: handle error
     return this.outboundMapper.map(
       await this.afip.ElectronicBilling.createNextVoucher(this.inboundMapper.map(data)),
     );

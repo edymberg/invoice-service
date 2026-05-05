@@ -94,6 +94,29 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/CreateInvoiceRequest' }
+            examples:
+              servicio:
+                summary: "Ejemplo para servicios"
+                value:
+                  externalId: "service-123"
+                  monto: 100.50
+                  dni: 30507012
+                  cuit: null
+                  concept: 2
+                  serviceFrom: "2025-10-01"
+                  serviceTo: "2025-10-31"
+                  pointOfSale: 1
+              producto:
+                summary: "Ejemplo para productos"
+                value:
+                  externalId: "product-123"
+                  monto: 100.50
+                  dni: 30507012
+                  cuit: null
+                  concept: 1
+                  serviceFrom: null
+                  serviceTo: null
+                  pointOfSale: 1
       responses:
         "201":
           description: Creada

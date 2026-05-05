@@ -1,4 +1,4 @@
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import { Invoice } from "../../domain/invoice/Invoice";
 import { InvoiceRepository } from "../../domain/invoice/repositories/InvoiceRepository";
@@ -42,7 +42,7 @@ export class IssueInvoiceUseCaseImpl implements IssueInvoiceUseCase {
     }
 
     const inv: Invoice = Invoice.builder()
-      .id(uuid())
+      .id(uuidv4())
       .externalId(input.externalId || "")
       .status(InvoiceStatus.Draft) // TODO: hardcoded - extract use case?
       .voucherType(VoucherType.C) // TODO: hardcoded - extract use case?

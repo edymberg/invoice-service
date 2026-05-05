@@ -1,11 +1,13 @@
+import "dotenv/config";
 import { buildApp } from "./app";
-import { env } from "./infrastructure/config/env";
+import { buildInvoiceServiceConfig } from "./infrastructure/config/env";
 
-buildApp()
+const config = buildInvoiceServiceConfig();
+buildApp(config)
   .then((app) => {
-    app.listen(env.port, () => {
+    app.listen(config.port, () => {
       // eslint-disable-next-line no-console
-      console.log(`Server listening on :${env.port}`);
+      console.log(`Server listening on :${config.port}`);
     });
   })
   .catch((error) => {

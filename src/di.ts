@@ -1,3 +1,4 @@
+import { isEnv, NodeEnvironment } from "../framework/config";
 import { Swagger } from "../framework/http";
 import { PinoLoggerFactory } from "../framework/logging";
 import { MaskedDTO } from "../framework/mediator";
@@ -26,10 +27,12 @@ import { IdempotencyStoreMongoAdapter } from "./infrastructure/adapters/outbound
 import { InvoiceRepositoryMongoAdapter } from "./infrastructure/adapters/outbound/persistance/mongo/InvoiceRepositoryMongoAdapter";
 import { MongoClientProvider } from "./infrastructure/adapters/outbound/persistance/mongo/MongoClientProvider";
 import { AfipSdkElectronicBillingAdapter } from "./infrastructure/adapters/outbound/sdk/afip/AfipSdkElectronicBillingAdapter";
+import { AfipSdkElectronicBillingMockAdapter } from "./infrastructure/adapters/outbound/sdk/afip/AfipSdkElectronicBillingMockAdapter";
 import { FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper } from "./infrastructure/adapters/outbound/sdk/afip/mappers/inbound/FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper";
 import { FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper } from "./infrastructure/adapters/outbound/sdk/afip/mappers/outbound/FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper";
+import { InvoiceServiceConfig } from "./infrastructure/config/env";
 
-export async function buildDependencies(): Promise<{
+export async function buildDependencies(invoiceServiceConfig: InvoiceServiceConfig): Promise<{
   invoiceController: InvoiceController;
   afipController: AfipController;
   healthController: HealthController;
@@ -37,23 +40,24 @@ export async function buildDependencies(): Promise<{
   swagger: Swagger;
 }> {
   // Logger
-  PinoLoggerFactory.configureLogger(process.env);
+  PinoLoggerFactory.configureLogger(invoiceServiceConfig);
 
   // Mongo DB
-  const db = await MongoClientProvider.getOrInitDataBase();
+  const db = await MongoClientProvider.getOrInitDataBase(invoiceServiceConfig);
 
   // Adapters
   const invoiceRepo = new InvoiceRepositoryMongoAdapter(db);
   const idemStore = new IdempotencyStoreMongoAdapter(db);
-  const ebillAdapter = new AfipSdkElectronicBillingAdapter(
+  const afipSdkAdapter = isEnv(NodeEnvironment.TEST) ? new AfipSdkElectronicBillingMockAdapter() : new AfipSdkElectronicBillingAdapter(
+    invoiceServiceConfig,
     new FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper(),
     new FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper(),
   );
 
   // Use cases
-  const issue = new IssueInvoiceUseCaseImpl(invoiceRepo, ebillAdapter, idemStore);
+  const issue = new IssueInvoiceUseCaseImpl(invoiceRepo, afipSdkAdapter, idemStore);
   const getInvoice = new GetInvoiceQuery(invoiceRepo);
-  const afipStatus = new GetAfipStatusQuery(ebillAdapter);
+  const afipStatus = new GetAfipStatusQuery(afipSdkAdapter);
 
   // Mappers
   const httpIssueInvoiceOutMapper =
@@ -62,16 +66,22 @@ export async function buildDependencies(): Promise<{
   const httpGetInvoiceOutMapper = new FromGetInvoiceQueryToGetInvoiceResponseDTOMapper();
   const httpGetInvoiceInbMapper = new FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper();
 
+  // Masked DTOs
+  const maskedCreateInvoiceRequestDTO = {
+    mask: (input: CreateInvoiceRequestDTO) => JSON.stringify(input),
+  } as unknown as MaskedDTO<CreateInvoiceRequestDTO>;
+  const maskedCreateInvoiceEventInboundDTO = {
+    mask: (input: CreateInvoiceEventInboundDTO) => JSON.stringify(input),
+  } as unknown as MaskedDTO<CreateInvoiceEventInboundDTO>;
+  const maskeGetInvoiceRequestDTO = {
+    mask: (input: GetInvoiceRequestDTO) => JSON.stringify(input),
+  } as unknown as MaskedDTO<GetInvoiceRequestDTO>;
+
   // Handlers
   const httpIssueInvoiceHandler = new IssueInvoiceHandler<
     CreateInvoiceRequestDTO,
     CreateInvoiceResponseDTO
-  >(
-    issue,
-    httpIssueInvoiceInbMapper,
-    httpIssueInvoiceOutMapper,
-    null as unknown as MaskedDTO<CreateInvoiceRequestDTO>,
-  );
+  >(issue, httpIssueInvoiceInbMapper, httpIssueInvoiceOutMapper, maskedCreateInvoiceRequestDTO);
   const eventIssueInvoiceHandler = new IssueInvoiceHandler<
     CreateInvoiceEventInboundDTO,
     CreateInvoiceEventOutboundDTO
@@ -79,13 +89,13 @@ export async function buildDependencies(): Promise<{
     issue,
     new FromEventToUseCaseMapper(),
     new FromUseCaseToEventMapper(),
-    null as unknown as MaskedDTO<CreateInvoiceEventInboundDTO>,
+    maskedCreateInvoiceEventInboundDTO,
   );
   const httpGetInvoiceHandler = new GetInvoiceHandler(
     getInvoice,
     httpGetInvoiceInbMapper,
     httpGetInvoiceOutMapper,
-    null as unknown as MaskedDTO<GetInvoiceRequestDTO>,
+    maskeGetInvoiceRequestDTO,
   );
 
   // Controllers

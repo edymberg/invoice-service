@@ -1,4 +1,4 @@
-import { BusinessRuleViolation } from "../../../../framework/ddd/BusinessRuleViolation";
+import { BusinessRule, BusinessRuleViolation } from "../../../../framework/ddd";
 
 export class IdentificationBusinessRuleViolation extends BusinessRuleViolation {
   constructor(message: string) {
@@ -6,11 +6,7 @@ export class IdentificationBusinessRuleViolation extends BusinessRuleViolation {
   }
 }
 
-interface IdentificationBusinessRule {
-  validate(identification: Identification): void;
-}
-
-class IdentificationValueBusinessRules implements IdentificationBusinessRule {
+class IdentificationValueBusinessRules implements BusinessRule<Identification> {
   validate(identification: Identification): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const value: any = identification.value;
@@ -48,7 +44,7 @@ interface IdentificationFactoryI {
 
 export class Identification {
   // TODO: ¿las business rules deberian ser pasadas por constructor?
-  private businessRules: IdentificationBusinessRule[] = [new IdentificationValueBusinessRules()];
+  private businessRules: BusinessRule<Identification>[] = [new IdentificationValueBusinessRules()];
 
   private constructor(
     public readonly type: DocumentType,

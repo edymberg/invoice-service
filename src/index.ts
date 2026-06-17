@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { buildApp } from "./app";
 import { buildInvoiceServiceConfig } from "./infrastructure/config/env";
 

@@ -1,15 +1,11 @@
 import dayjs from "dayjs";
 
-import { BusinessRuleViolation } from "../../../../framework/ddd/BusinessRuleViolation";
+import { BusinessRule, BusinessRuleViolation } from "../../../../framework/ddd";
 
 export class DayDateBusinessRuleViolation extends BusinessRuleViolation {
   constructor(message: string) {
     super(message);
   }
-}
-
-interface DayDateBusinessRule {
-  validate(date: DayDate): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,7 +15,7 @@ const positiveNumber = (value: any): boolean => {
   return !negative || !infinite || !Number.isNaN(value);
 };
 
-class DayBusinessRules implements DayDateBusinessRule {
+class DayBusinessRules implements BusinessRule<DayDate> {
   validate(date: DayDate): void {
     if (!positiveNumber(date.day) || date.day > 31) {
       throw new DayDateBusinessRuleViolation(`Day must be a positive number, given: ${date.day}`);
@@ -27,7 +23,7 @@ class DayBusinessRules implements DayDateBusinessRule {
   }
 }
 
-class MonthBusinessRules implements DayDateBusinessRule {
+class MonthBusinessRules implements BusinessRule<DayDate> {
   validate(date: DayDate): void {
     if (!positiveNumber(date.month) || date.month > 12) {
       throw new DayDateBusinessRuleViolation(
@@ -37,7 +33,7 @@ class MonthBusinessRules implements DayDateBusinessRule {
   }
 }
 
-class YearBusinessRules implements DayDateBusinessRule {
+class YearBusinessRules implements BusinessRule<DayDate> {
   validate(date: DayDate): void {
     if (!positiveNumber(date.year)) {
       throw new DayDateBusinessRuleViolation(`Year must be a positive number, given: ${date.year}`);
@@ -61,7 +57,7 @@ export type DayDate = {
 // TODO: try to remove dayjs dependency
 
 export class Day {
-  private businessRules: DayDateBusinessRule[] = [
+  private businessRules: BusinessRule<DayDate>[] = [
     new DayBusinessRules(),
     new MonthBusinessRules(),
     new YearBusinessRules(),

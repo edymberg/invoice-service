@@ -53,7 +53,7 @@ function parseInnerClassesLogLevels(env: NodeJS.ProcessEnv): Record<string, LogL
 /** NODE ENV */
 export enum NodeEnvironment {
   TEST = "test",
-  LOCAL = "local",
+  LOCAL = "local", // Default environment
   DEV = "dev",
   STG = "stg",
   PROD = "prod",

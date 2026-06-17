@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { EnvironmentVariables, buildEnvironmentVariables } from "../../../framework/config";
 
 enum ArcaEnvironment {

@@ -14,14 +14,15 @@ export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
   }
 }
 
-class ConceptServicesBusinessRules implements BusinessRule<Invoice> {
-  validate(invoice: Invoice): void {
+class ConceptServicesBusinessRules extends BusinessRule<Invoice> {
+  doValidate(invoice: Invoice): BusinessRuleViolation | null {
     if (invoice.isServiceConcept() && !invoice.serviceFrom) {
-      throw new InvoiceBusinessRuleViolation("ServiceFrom is required for Concept.SERVICES");
+      return new InvoiceBusinessRuleViolation("ServiceFrom is required for Concept.SERVICES");
     }
     if (invoice.isServiceConcept() && !invoice.serviceTo) {
-      throw new InvoiceBusinessRuleViolation("ServiceTo is required for Concept.SERVICES");
+      return new InvoiceBusinessRuleViolation("ServiceTo is required for Concept.SERVICES");
     }
+    return null;
   }
 }
 

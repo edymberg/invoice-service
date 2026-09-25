@@ -15,29 +15,32 @@ const positiveNumber = (value: any): boolean => {
   return !negative || !infinite || !Number.isNaN(value);
 };
 
-class DayBusinessRules implements BusinessRule<DayDate> {
-  validate(date: DayDate): void {
+class DayBusinessRules extends BusinessRule<DayDate> {
+  doValidate(date: DayDate): BusinessRuleViolation | null {
     if (!positiveNumber(date.day) || date.day > 31) {
-      throw new DayDateBusinessRuleViolation(`Day must be a positive number, given: ${date.day}`);
+      return new DayDateBusinessRuleViolation(`Day must be a positive number, given: ${date.day}`);
     }
+    return null;
   }
 }
 
-class MonthBusinessRules implements BusinessRule<DayDate> {
-  validate(date: DayDate): void {
+class MonthBusinessRules extends BusinessRule<DayDate> {
+  doValidate(date: DayDate): BusinessRuleViolation | null {
     if (!positiveNumber(date.month) || date.month > 12) {
-      throw new DayDateBusinessRuleViolation(
+      return new DayDateBusinessRuleViolation(
         `Month must be a positive number between 1 and 12, given: ${date.month}`,
       );
     }
+    return null;
   }
 }
 
-class YearBusinessRules implements BusinessRule<DayDate> {
-  validate(date: DayDate): void {
+class YearBusinessRules extends BusinessRule<DayDate> {
+  doValidate(date: DayDate): BusinessRuleViolation | null {
     if (!positiveNumber(date.year)) {
-      throw new DayDateBusinessRuleViolation(`Year must be a positive number, given: ${date.year}`);
+      return new DayDateBusinessRuleViolation(`Year must be a positive number, given: ${date.year}`);
     }
+    return null;
   }
 }
 

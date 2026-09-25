@@ -6,16 +6,16 @@ export class IdentificationBusinessRuleViolation extends BusinessRuleViolation {
   }
 }
 
-class IdentificationValueBusinessRules implements BusinessRule<Identification> {
-  validate(identification: Identification): void {
+class IdentificationValueBusinessRules extends BusinessRule<Identification> {
+  doValidate(identification: Identification): BusinessRuleViolation | null {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const value: any = identification.value;
 
     if (value === null || value === undefined) {
-      throw new IdentificationBusinessRuleViolation(`Value is required. Given: ${value}`);
+      return new IdentificationBusinessRuleViolation(`Value is required. Given: ${value}`);
     }
     if (!Number.isInteger(value) || value <= 0) {
-      throw new IdentificationBusinessRuleViolation(
+      return new IdentificationBusinessRuleViolation(
         `Invalid value: ${value === "" ? "empty string" : value}. Should be a positive integer`,
       );
     }
@@ -23,10 +23,11 @@ class IdentificationValueBusinessRules implements BusinessRule<Identification> {
     const minLen = 5;
     const maxLen = 12;
     if (len < minLen || len > maxLen) {
-      throw new IdentificationBusinessRuleViolation(
+      return new IdentificationBusinessRuleViolation(
         `Invalid value length: ${len}. Should be between ${minLen} and ${maxLen}`,
       );
     }
+    return null;
   }
 }
 

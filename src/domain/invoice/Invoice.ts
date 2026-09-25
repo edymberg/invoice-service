@@ -6,7 +6,7 @@ import { InvoiceStatus } from "./vo/InvoiceStatus";
 import { Money } from "./vo/Money";
 import { PointOfSale } from "./vo/PointOfSale";
 import { VoucherType } from "./vo/VoucherType";
-import { BusinessRuleViolation } from "../../../framework/ddd/BusinessRuleViolation";
+import { BusinessRule, BusinessRuleViolation } from "../../../framework/ddd";
 
 export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
   constructor(message: string) {
@@ -14,19 +14,15 @@ export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
   }
 }
 
-// TODO: extend from ddd/BusinessRule
-interface InvoiceBusinessRule {
-  validate(invoice: Invoice): void;
-}
-
-class ConceptServicesBusinessRules implements InvoiceBusinessRule {
-  validate(invoice: Invoice): void {
+class ConceptServicesBusinessRules extends BusinessRule<Invoice> {
+  doValidate(invoice: Invoice): BusinessRuleViolation | null {
     if (invoice.isServiceConcept() && !invoice.serviceFrom) {
-      throw new InvoiceBusinessRuleViolation("ServiceFrom is required for Concept.SERVICES");
+      return new InvoiceBusinessRuleViolation("ServiceFrom is required for Concept.SERVICES");
     }
     if (invoice.isServiceConcept() && !invoice.serviceTo) {
-      throw new InvoiceBusinessRuleViolation("ServiceTo is required for Concept.SERVICES");
+      return new InvoiceBusinessRuleViolation("ServiceTo is required for Concept.SERVICES");
     }
+    return null;
   }
 }
 
@@ -49,7 +45,7 @@ interface InvoiceFactoryI {
 
 export class Invoice {
   // TODO: ¿las business rules deberian ser pasadas por constructor?
-  private businessRules: InvoiceBusinessRule[] = [new ConceptServicesBusinessRules()];
+  private businessRules: BusinessRule<Invoice>[] = [new ConceptServicesBusinessRules()];
 
   private constructor(
     public readonly id: string,

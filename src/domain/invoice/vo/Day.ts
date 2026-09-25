@@ -1,15 +1,11 @@
 import dayjs from "dayjs";
 
-import { BusinessRuleViolation } from "../../../../framework/ddd/BusinessRuleViolation";
+import { BusinessRule, BusinessRuleViolation } from "../../../../framework/ddd";
 
 export class DayDateBusinessRuleViolation extends BusinessRuleViolation {
   constructor(message: string) {
     super(message);
   }
-}
-
-interface DayDateBusinessRule {
-  validate(date: DayDate): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,29 +15,32 @@ const positiveNumber = (value: any): boolean => {
   return !negative || !infinite || !Number.isNaN(value);
 };
 
-class DayBusinessRules implements DayDateBusinessRule {
-  validate(date: DayDate): void {
+class DayBusinessRules extends BusinessRule<DayDate> {
+  doValidate(date: DayDate): BusinessRuleViolation | null {
     if (!positiveNumber(date.day) || date.day > 31) {
-      throw new DayDateBusinessRuleViolation(`Day must be a positive number, given: ${date.day}`);
+      return new DayDateBusinessRuleViolation(`Day must be a positive number, given: ${date.day}`);
     }
+    return null;
   }
 }
 
-class MonthBusinessRules implements DayDateBusinessRule {
-  validate(date: DayDate): void {
+class MonthBusinessRules extends BusinessRule<DayDate> {
+  doValidate(date: DayDate): BusinessRuleViolation | null {
     if (!positiveNumber(date.month) || date.month > 12) {
-      throw new DayDateBusinessRuleViolation(
+      return new DayDateBusinessRuleViolation(
         `Month must be a positive number between 1 and 12, given: ${date.month}`,
       );
     }
+    return null;
   }
 }
 
-class YearBusinessRules implements DayDateBusinessRule {
-  validate(date: DayDate): void {
+class YearBusinessRules extends BusinessRule<DayDate> {
+  doValidate(date: DayDate): BusinessRuleViolation | null {
     if (!positiveNumber(date.year)) {
-      throw new DayDateBusinessRuleViolation(`Year must be a positive number, given: ${date.year}`);
+      return new DayDateBusinessRuleViolation(`Year must be a positive number, given: ${date.year}`);
     }
+    return null;
   }
 }
 
@@ -61,7 +60,7 @@ export type DayDate = {
 // TODO: try to remove dayjs dependency
 
 export class Day {
-  private businessRules: DayDateBusinessRule[] = [
+  private businessRules: BusinessRule<DayDate>[] = [
     new DayBusinessRules(),
     new MonthBusinessRules(),
     new YearBusinessRules(),

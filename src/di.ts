@@ -48,11 +48,13 @@ export async function buildDependencies(invoiceServiceConfig: InvoiceServiceConf
   // Adapters
   const invoiceRepo = new InvoiceRepositoryMongoAdapter(db);
   const idemStore = new IdempotencyStoreMongoAdapter(db);
-  const afipSdkAdapter = isEnv(NodeEnvironment.TEST) ? new AfipSdkElectronicBillingMockAdapter() : new AfipSdkElectronicBillingAdapter(
-    invoiceServiceConfig,
-    new FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper(),
-    new FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper(),
-  );
+  const afipSdkAdapter = isEnv(NodeEnvironment.TEST)
+    ? new AfipSdkElectronicBillingMockAdapter()
+    : new AfipSdkElectronicBillingAdapter(
+        invoiceServiceConfig,
+        new FromCreateVoucherRequestToAFIPCreateNextVoucherDTOMapper(),
+        new FromAFIPCreateNextVoucherToCreateNextVoucherResultDTOMapper(),
+      );
 
   // Use cases
   const issue = new IssueInvoiceUseCaseImpl(invoiceRepo, afipSdkAdapter, idemStore);

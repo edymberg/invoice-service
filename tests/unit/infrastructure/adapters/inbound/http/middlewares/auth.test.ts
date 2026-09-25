@@ -5,16 +5,12 @@ import { InvoiceServiceConfig } from "../../../../../../../src/infrastructure/co
 jest.mock("../../../../../../../framework/logging", () => ({
   PinoLoggerFactory: {
     getLogger: jest.fn(() => ({
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
       error: jest.fn(),
     })),
   },
-}));
-
-jest.mock("../../../../../../../src/infrastructure/config/env", () => ({
-  InvoiceServiceConfig: {},
-  buildInvoiceServiceConfig: jest.fn(() => ({
-    apiKey: "test-api-key-123",
-  })),
 }));
 
 describe("authMiddleware", () => {
@@ -34,7 +30,7 @@ describe("authMiddleware", () => {
     };
     mockNext = jest.fn();
     mockConfig = {
-      apiKey: "test-api-key-123",
+      apiKey: "your_api_key_here",
     } as InvoiceServiceConfig;
     authMiddleware = authMiddlewareFactory(mockConfig);
   });
@@ -42,7 +38,7 @@ describe("authMiddleware", () => {
   describe("Given valid authentication", () => {
     it("should call next() when authorization header is present and valid", () => {
       mockRequest.headers = {
-        authorization: "Bearer test-api-key-123",
+        authorization: "Bearer your_api_key_here",
       };
 
       authMiddleware(
@@ -89,7 +85,7 @@ describe("authMiddleware", () => {
   describe("Given invalid authorization format", () => {
     it("should return 401 when authorization header doesn't start with Bearer", () => {
       mockRequest.headers = {
-        authorization: "Basic test-api-key-123",
+        authorization: "Basic your_api_key_here",
       };
 
       authMiddleware(
@@ -178,7 +174,7 @@ describe("authMiddleware", () => {
   describe("Given case sensitivity", () => {
     it("should handle authorization header case correctly", () => {
       mockRequest.headers = {
-        authorization: "Bearer test-api-key-123",
+        authorization: "Bearer your_api_key_here",
       };
 
       authMiddleware(

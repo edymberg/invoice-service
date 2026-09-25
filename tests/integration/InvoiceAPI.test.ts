@@ -23,6 +23,13 @@ describe('Invoice API Integration Tests', () => {
   });
 
   describe('POST /invoices', () => {
+    const act = (requestBody: any, token: string) => {
+      return request(app)
+        .post('/invoices')
+        .set('Authorization', token)
+        .send(requestBody);
+    };
+
     const validProductInvoiceRequest = {
       externalId: "test-invoice-123",
       monto: 100.50,
@@ -43,12 +50,9 @@ describe('Invoice API Integration Tests', () => {
 
     describe('Authentication', () => {
       it('should reject requests without valid API key', async () => {
-        const response = await request(app)
-            .post('/invoices')
-            .set('Authorization', 'Bearer invalid-key')
-            .send(validProductInvoiceRequest)
-            .expect(401);
+        const response = await act(validProductInvoiceRequest, 'Bearer invalid-key');
 
+        expect(response.status).toBe(401);
         expect(response.body).toHaveProperty('error');
         expect(response.body.error).toBe('Unauthorized');
       });
@@ -56,12 +60,9 @@ describe('Invoice API Integration Tests', () => {
 
     describe('Product Invoices', () => {
       it('should create a product invoice successfully', async () => {
-        const response = await request(app)
-            .post('/invoices')
-            .set('Authorization', authToken)
-            .send(validProductInvoiceRequest)
-            .expect(201);
+        const response = await act(validProductInvoiceRequest, authToken);
 
+        expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('id');
         expect(response.body).toHaveProperty('status');
         expect(response.body).toHaveProperty('cae');
@@ -74,12 +75,9 @@ describe('Invoice API Integration Tests', () => {
 
     describe('Service Invoices', () => {
       it('should create a service invoice successfully', async () => {
-        const response = await request(app)
-            .post('/invoices')
-            .set('Authorization', authToken)
-            .send(validServiceInvoiceRequest)
-            .expect(201);
+        const response = await act(validServiceInvoiceRequest, authToken);
 
+        expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('id');
         expect(response.body).toHaveProperty('status');
         expect(response.body).toHaveProperty('cae');
@@ -93,19 +91,13 @@ describe('Invoice API Integration Tests', () => {
     describe('Idempotency', () => {
       it('should handle idempotency - return same invoice for duplicate externalId', async () => {
         // First request
-        const firstResponse = await request(app)
-          .post('/invoices')
-          .set('Authorization', authToken)
-          .send(validProductInvoiceRequest)
-          .expect(201);
+        const firstResponse = await act(validProductInvoiceRequest, authToken);
+        expect(firstResponse.status).toBe(201);
 
         // Second request with same externalId
-        const secondResponse = await request(app)
-          .post('/invoices')
-          .set('Authorization', authToken)
-          .send(validProductInvoiceRequest)
-          .expect(201);
+        const secondResponse = await act(validProductInvoiceRequest, authToken);
 
+        expect(secondResponse.status).toBe(201);
         expect(firstResponse.body.id).toBe(secondResponse.body.id);
         expect(firstResponse.body.externalId).toBe(secondResponse.body.externalId);
       });
@@ -117,16 +109,13 @@ describe('Invoice API Integration Tests', () => {
           monto: 100.50
         };
 
-        const response = await request(app)
-          .post('/invoices')
-          .set('Authorization', authToken)
-          .send(invalidRequest)
-          .expect(400);
+        const response = await act(invalidRequest, authToken);
 
-
+        expect(response.status).toBe(400);
         expect(response.body).toHaveProperty('error');
         expect(response.body.error).toBe('Validation failed');
         expect(response.body).toHaveProperty('details');
+        // TODO: assert response.body.details through the expected errors 
         expect(response.body).toHaveProperty('correlationId');
       });
 
@@ -136,15 +125,13 @@ describe('Invoice API Integration Tests', () => {
           serviceFrom: "invalid",
         };
 
-        const response = await request(app)
-          .post('/invoices')
-          .set('Authorization', authToken)
-          .send(invalidRequest)
-          .expect(400);
+        const response = await act(invalidRequest, authToken);
 
+        expect(response.status).toBe(400);
         expect(response.body).toHaveProperty('error');
         expect(response.body.error).toBe('Validation failed');
         expect(response.body).toHaveProperty('details');
+        // TODO: assert response.body.details through the expected errors
         expect(response.body).toHaveProperty('correlationId');
       });
     });

@@ -5,8 +5,7 @@ import {
 } from "../../../../../business/ports/ElectronicBillingPort";
 
 export class AfipSdkElectronicBillingMockAdapter implements ElectronicBillingPort {
-
-  async createNextVoucher(data: CreateVoucherRequest): Promise<CreateNextVoucherResult> {
+  async createNextVoucher(_: CreateVoucherRequest): Promise<CreateNextVoucherResult> {
     // TODO: handle error
     return Promise.resolve({
       CAE: "12345678901234567890", // TODO: que es el cae? Se puede sacar del CreateVoucherRequest?

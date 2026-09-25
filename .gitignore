@@ -3,6 +3,7 @@ node_modules/
 .idea/
 .vscode/
 dist/
+coverage/
 
 # Auto-generated files
 src/infrastructure/adapters/inbound/http/generated/

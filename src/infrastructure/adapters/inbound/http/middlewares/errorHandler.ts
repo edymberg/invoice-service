@@ -4,6 +4,8 @@ import { BusinessRuleViolation } from "../../../../../../framework/ddd/BusinessR
 import { DTOMappingException } from "../../../../../../framework/http/DTOValidator";
 import { PinoLoggerFactory } from "../../../../../../framework/logging";
 
+// TODO: return ErrorResponseDTO
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
   const logger = PinoLoggerFactory.getLogger("ErrorHandler");

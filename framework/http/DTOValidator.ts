@@ -1,3 +1,5 @@
+// TODO: rename RestDTOError to DTOError and any reference to restDTOError.
+// restDTOError -> dtoError. This DTO Mapping Exception could appear at REST as like in any other context.
 export type RestDTOError = {
   path: string;
   code: string;
@@ -5,7 +7,6 @@ export type RestDTOError = {
 }[];
 
 export class DTOMappingException extends Error {
-  // TODO: rename restDTOError
   public readonly restDTOError: RestDTOError;
 
   constructor(message: string, restDTOError: RestDTOError) {

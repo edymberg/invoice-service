@@ -26,7 +26,6 @@ export class FromHttpToInvoiceRequestDTOMapper implements Mapper<unknown, Create
       pointOfSale: z.number().int().positive(),
     });
 
-    // TODO: handle ZodError and return DTOValidationException
     try {
       return schema.parse(json) as CreateInvoiceRequestDTO;
     } catch (error: any) {

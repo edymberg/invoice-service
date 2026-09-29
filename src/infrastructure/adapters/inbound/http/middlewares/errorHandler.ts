@@ -5,8 +5,6 @@ import { DTOMappingException } from "../../../../../../framework/http/DTOValidat
 import { PinoLoggerFactory } from "../../../../../../framework/logging";
 import { ErrorResponseDTO } from "../dtos/ErrorResponseDTO";
 
-// TODO: return ErrorResponseDTO
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
   const logger = PinoLoggerFactory.getLogger("ErrorHandler");
@@ -18,17 +16,14 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
 
   switch (err.constructor) {
     case DTOMappingException:
-      // Handle DTOMappingException (400 Bad Request)
       logger.warn({ correlationId, message, errors: err.error }, "DTO validation failed");
-      const dtoValidationError: ErrorResponseDTO = mapValidationError(err, correlationId);
+      const dtoValidationError: ErrorResponseDTO = mapToErrorResponseDTO(err, correlationId, 400);
       return res.status(dtoValidationError.status!).json(dtoValidationError);
     case BusinessRuleViolation:
-      // Handle BusinessRuleViolation (422 Unprocessable Entity)
       logger.warn({ correlationId, message }, "Business rule violation");
-      const businessRuleError: ErrorResponseDTO = mapBusinessRuleViolation(err, correlationId);
+      const businessRuleError: ErrorResponseDTO = mapToErrorResponseDTO(err, correlationId, 422);
       return res.status(businessRuleError.status!).json(businessRuleError);
     default:
-      // Handle generic errors
       logger.error({ err: { ...err, message, stack: err.stack }, correlationId }, "Internal Server Error");
       const errorResponse = {
         message: "Internal Server Error",
@@ -40,25 +35,11 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
   }
 }
 
-
-function mapValidationError(error: DTOMappingException, id: string): ErrorResponseDTO {
+function mapToErrorResponseDTO(error: DTOMappingException | BusinessRuleViolation, id: string, statusCode: number): ErrorResponseDTO {
   return {
     message: error.message,
     correlationId: id,
-    status: 400,
-    details: error.error.map(detail => ({
-      code: detail.code,
-      field: detail.path,
-      message: detail.message,
-    })),
-  } as ErrorResponseDTO;
-}
-
-function mapBusinessRuleViolation(error: BusinessRuleViolation, id: string): ErrorResponseDTO {
-  return {
-    message: error.message,
-    correlationId: id,
-    status: 422,
+    status: statusCode,
     details: error.error.map(detail => ({
       code: detail.code,
       field: detail.path,

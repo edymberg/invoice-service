@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
-import { BusinessRuleViolation } from "../../../../../../framework/ddd/BusinessRuleViolation";
-import { DTOMappingException, RestDTOError } from "../../../../../../framework/http/DTOValidator";
+import { BusinessRuleViolation } from "../../../../../../framework/ddd/BusinessRule";
+import { DTOMappingException } from "../../../../../../framework/http/DTOValidator";
 import { PinoLoggerFactory } from "../../../../../../framework/logging";
-import { ErrorResponseDTO } from "../generated/api-types";
+import { ErrorResponseDTO } from "../dtos/ErrorResponseDTO";
 
 // TODO: return ErrorResponseDTO
 
@@ -42,15 +42,14 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
 
 
 function mapValidationError(error: DTOMappingException, id: string): ErrorResponseDTO {
-  const details: RestDTOError = error.restDTOError;
   return {
     message: error.message,
     correlationId: id,
-    status: 400, // TODO: the status code should come from the detials.code
-    details: details.map(detail => ({
+    status: 400,
+    details: error.restDTOError.map(detail => ({
       code: detail.code,
       field: detail.path,
-      message: detail.message
+      message: detail.message,
     })),
   } as ErrorResponseDTO;
 }
@@ -59,7 +58,11 @@ function mapBusinessRuleViolation(error: BusinessRuleViolation, id: string): Err
   return {
     message: error.message,
     correlationId: id,
-    status: 422, // TODO: the status code should come from the error.code
-    details: [],
+    status: 422,
+    details: error.error.map(detail => ({
+      code: detail.code,
+      field: detail.path,
+      message: detail.message,
+    })),
   } as ErrorResponseDTO;
 }

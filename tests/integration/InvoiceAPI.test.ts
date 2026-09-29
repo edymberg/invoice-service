@@ -112,11 +112,29 @@ describe('Invoice API Integration Tests', () => {
         const response = await act(invalidRequest, authToken);
 
         expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty('error');
-        expect(response.body.error).toBe('Validation failed');
-        expect(response.body).toHaveProperty('details');
-        // TODO: assert response.body.details through the expected errors 
+
         expect(response.body).toHaveProperty('correlationId');
+        expect(response.body).toHaveProperty('status');
+        expect(response.body).toHaveProperty('message');
+        expect(response.body).toHaveProperty('details');
+
+        expect(response.body.status).toBe(400);
+        expect(response.body.message).toBe('Invalid request body');
+        expect(response.body.details).toHaveLength(2);
+        
+        expect(response.body.details[0]).toHaveProperty('code');
+        expect(response.body.details[0]).toHaveProperty('field');
+        expect(response.body.details[0]).toHaveProperty('message');
+        expect(response.body.details[0].code).toBe('invalid_union');
+        expect(response.body.details[0].field).toBe('concept');
+        expect(response.body.details[0].message).toBe('Invalid input');
+
+        expect(response.body.details[1]).toHaveProperty('code');
+        expect(response.body.details[1]).toHaveProperty('field');
+        expect(response.body.details[1]).toHaveProperty('message');
+        expect(response.body.details[1].code).toBe('invalid_type');
+        expect(response.body.details[1].field).toBe('pointOfSale');
+        expect(response.body.details[1].message).toBe('Required');
       });
 
       it('should return 400 for invalid request - DTOMappingException', async () => {
@@ -128,11 +146,23 @@ describe('Invoice API Integration Tests', () => {
         const response = await act(invalidRequest, authToken);
 
         expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty('error');
-        expect(response.body.error).toBe('Validation failed');
-        expect(response.body).toHaveProperty('details');
-        // TODO: assert response.body.details through the expected errors
+
         expect(response.body).toHaveProperty('correlationId');
+        expect(response.body).toHaveProperty('status');
+        expect(response.body).toHaveProperty('message');
+        expect(response.body).toHaveProperty('details');
+
+        expect(response.body.status).toBe(400);
+        expect(response.body.message).toBe('Invalid request body');
+        expect(response.body.details).toHaveLength(1);
+        
+        expect(response.body.details[0]).toHaveProperty('code');
+        expect(response.body.details[0]).toHaveProperty('field');
+        expect(response.body.details[0]).toHaveProperty('message');
+        
+        expect(response.body.details[0].code).toBe('invalid_string');
+        expect(response.body.details[0].field).toBe('serviceFrom');
+        expect(response.body.details[0].message).toBe('Invalid');
       });
     });
   });

@@ -1,46 +1,64 @@
 import dayjs from "dayjs";
 
-import { BusinessRule, BusinessRuleViolation } from "../../../../framework/ddd";
+import { BusinessRule, DomainError } from "../../../../framework/ddd";
 
-export class DayDateBusinessRuleViolation extends BusinessRuleViolation {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const positiveNumber = (value: any): boolean => {
-  const negative = value <= 0;
+const positiveNumber = (value: unknown): boolean => {
   const infinite = !Number.isFinite(value);
-  return !negative || !infinite || !Number.isNaN(value);
+  return !infinite || !Number.isNaN(value);
 };
 
 class DayBusinessRules extends BusinessRule<DayDate> {
-  doValidate(date: DayDate): BusinessRuleViolation | null {
-    if (!positiveNumber(date.day) || date.day > 31) {
-      return new DayDateBusinessRuleViolation(`Day must be a positive number, given: ${date.day}`);
+  private readonly CODE = "DAY";
+  private readonly MIN_DAY = 1;
+  private readonly MAX_DAY = 31;
+
+  doValidate(date: DayDate): DomainError {
+    const domainError: DomainError = [];
+
+    if (date.day > this.MAX_DAY || date.day < this.MIN_DAY) {
+      domainError.push({
+        path: "date.day",
+        code: `${this.CODE}-000-000`,
+        message: `Day must be a positive number between 1 and 31, given: ${date.day}`,
+      });
     }
-    return null;
+    return domainError;
   }
 }
 
 class MonthBusinessRules extends BusinessRule<DayDate> {
-  doValidate(date: DayDate): BusinessRuleViolation | null {
-    if (!positiveNumber(date.month) || date.month > 12) {
-      return new DayDateBusinessRuleViolation(
-        `Month must be a positive number between 1 and 12, given: ${date.month}`,
-      );
+  private readonly CODE = "MONTH";
+  private readonly MIN_MONTH = 1;
+  private readonly MAX_MONTH = 12;
+
+  doValidate(date: DayDate): DomainError {
+    const domainError: DomainError = [];
+    
+    if (date.month > this.MAX_MONTH || date.month < this.MIN_MONTH) {
+      domainError.push({
+        path: "date.month",
+        code: `${this.CODE}-000-000`,
+        message: `Month must be a positive number between 1 and 12, given: ${date.month}`,
+      });
     }
-    return null;
+    return domainError;
   }
 }
 
 class YearBusinessRules extends BusinessRule<DayDate> {
-  doValidate(date: DayDate): BusinessRuleViolation | null {
+  private readonly CODE = "YEAR";
+
+  doValidate(date: DayDate): DomainError {
+    const domainError: DomainError = [];
+    
     if (!positiveNumber(date.year)) {
-      return new DayDateBusinessRuleViolation(`Year must be a positive number, given: ${date.year}`);
+      domainError.push({
+        path: "date.year",
+        code: `${this.CODE}-000-000`,
+        message: `Year must be a finite number, given: ${date.year}`,
+      });
     }
-    return null;
+    return domainError;
   }
 }
 

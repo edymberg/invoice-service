@@ -1,2 +1,1 @@
-export { BusinessRuleViolation } from "./BusinessRuleViolation";
-export { BusinessRule } from "./BusinessRule";
+export { BusinessRuleViolation, BusinessRule, DomainError } from "./BusinessRule";

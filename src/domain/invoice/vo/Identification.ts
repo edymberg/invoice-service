@@ -10,7 +10,7 @@ class IdentificationValueBusinessRules extends BusinessRule<Identification> {
   }
 
   private ilegalNumber(value: unknown): boolean {
-    return !Number.isInteger(value) || Number(value) <= 0
+    return !Number.isInteger(value) || Number(value) <= 0;
   }
 
   private outOfBoundary(value: unknown): boolean {

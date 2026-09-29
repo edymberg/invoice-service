@@ -24,7 +24,10 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
       const businessRuleError: ErrorResponseDTO = mapToErrorResponseDTO(err, correlationId, 422);
       return res.status(businessRuleError.status!).json(businessRuleError);
     default:
-      logger.error({ err: { ...err, message, stack: err.stack }, correlationId }, "Internal Server Error");
+      logger.error(
+        { err: { ...err, message, stack: err.stack }, correlationId },
+        "Internal Server Error",
+      );
       const errorResponse = {
         message: "Internal Server Error",
         correlationId,
@@ -35,12 +38,16 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
   }
 }
 
-function mapToErrorResponseDTO(error: DTOMappingException | BusinessRuleViolation, id: string, statusCode: number): ErrorResponseDTO {
+function mapToErrorResponseDTO(
+  error: DTOMappingException | BusinessRuleViolation,
+  id: string,
+  statusCode: number,
+): ErrorResponseDTO {
   return {
     message: error.message,
     correlationId: id,
     status: statusCode,
-    details: error.error.map(detail => ({
+    details: error.error.map((detail) => ({
       code: detail.code,
       field: detail.path,
       message: detail.message,

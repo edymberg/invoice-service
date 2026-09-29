@@ -33,7 +33,7 @@ class MonthBusinessRules extends BusinessRule<DayDate> {
 
   doValidate(date: DayDate): DomainError {
     const domainError: DomainError = [];
-    
+
     if (date.month > this.MAX_MONTH || date.month < this.MIN_MONTH) {
       domainError.push({
         path: "date.month",
@@ -50,7 +50,7 @@ class YearBusinessRules extends BusinessRule<DayDate> {
 
   doValidate(date: DayDate): DomainError {
     const domainError: DomainError = [];
-    
+
     if (!positiveNumber(date.year)) {
       domainError.push({
         path: "date.year",

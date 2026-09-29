@@ -1,17 +1,15 @@
-// TODO: rename RestDTOError to DTOError and any reference to restDTOError.
-// restDTOError -> dtoError. This DTO Mapping Exception could appear at REST as like in any other context.
-export type RestDTOError = {
+export type DTOError = {
   path: string;
   code: string;
   message: string;
 }[];
 
 export class DTOMappingException extends Error {
-  public readonly restDTOError: RestDTOError;
+  public readonly error: DTOError;
 
-  constructor(message: string, restDTOError: RestDTOError) {
+  constructor(message: string, dtoError: DTOError) {
     super(message);
-    this.restDTOError = restDTOError;
+    this.error = dtoError;
   }
 }
 
@@ -21,12 +19,12 @@ export interface DTOValidator {
 
 export abstract class AbstractDTOValidator implements DTOValidator {
   public validateDTO(dto: unknown) {
-    const restDTOError: RestDTOError = this.doValidations(dto);
+    const dtoError: DTOError = this.doValidations(dto);
 
-    if (restDTOError.length > 0) {
-      throw new DTOMappingException("There where errors mapping the given DTO", restDTOError);
+    if (dtoError.length > 0) {
+      throw new DTOMappingException("There where errors mapping the given DTO", dtoError);
     }
   }
 
-  protected abstract doValidations(dto: unknown): RestDTOError;
+  protected abstract doValidations(dto: unknown): DTOError;
 }

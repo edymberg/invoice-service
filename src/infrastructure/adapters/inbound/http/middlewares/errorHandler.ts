@@ -19,7 +19,7 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
   switch (err.constructor) {
     case DTOMappingException:
       // Handle DTOMappingException (400 Bad Request)
-      logger.warn({ correlationId, message, errors: err.restDTOError }, "DTO validation failed");
+      logger.warn({ correlationId, message, errors: err.error }, "DTO validation failed");
       const dtoValidationError: ErrorResponseDTO = mapValidationError(err, correlationId);
       return res.status(dtoValidationError.status!).json(dtoValidationError);
     case BusinessRuleViolation:
@@ -46,7 +46,7 @@ function mapValidationError(error: DTOMappingException, id: string): ErrorRespon
     message: error.message,
     correlationId: id,
     status: 400,
-    details: error.restDTOError.map(detail => ({
+    details: error.error.map(detail => ({
       code: detail.code,
       field: detail.path,
       message: detail.message,

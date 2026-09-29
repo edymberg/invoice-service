@@ -1,4 +1,4 @@
-import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
+import { AbstractDTOValidator, DTOError } from "../../../../../../../framework/http";
 import { Mapper } from "../../../../../../../framework/mediator";
 import { IssueInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { Day } from "../../../../../../domain/invoice/vo/Day";
@@ -9,7 +9,7 @@ export class FromEventToUseCaseMapper
   extends AbstractDTOValidator
   implements Mapper<CreateInvoiceEventInboundDTO, IssueInvoiceUseCaseInput>
 {
-  protected doValidations(_dto: unknown): RestDTOError {
+  protected doValidations(_dto: unknown): DTOError {
     return [];
   }
 

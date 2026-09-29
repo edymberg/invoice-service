@@ -113,6 +113,7 @@ describe('Invoice API Integration Tests', () => {
 
         expect(response.status).toBe(400);
 
+        // TODO: generate a custom matcher for GenericErrors
         expect(response.body).toHaveProperty('correlationId');
         expect(response.body).toHaveProperty('status');
         expect(response.body).toHaveProperty('message');
@@ -147,6 +148,7 @@ describe('Invoice API Integration Tests', () => {
 
         expect(response.status).toBe(400);
 
+        // TODO: generate a custom matcher for GenericErrors
         expect(response.body).toHaveProperty('correlationId');
         expect(response.body).toHaveProperty('status');
         expect(response.body).toHaveProperty('message');

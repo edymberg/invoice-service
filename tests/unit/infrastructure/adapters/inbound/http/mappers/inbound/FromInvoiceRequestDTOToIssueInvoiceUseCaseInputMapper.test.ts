@@ -80,14 +80,14 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
       mapper.map(dto, "idem-123");
     } catch (error) {
       expect(error).toBeInstanceOf(DTOMappingException);
-      expect((error as DTOMappingException).restDTOError.length).toBe(2);
-      expect((error as DTOMappingException).restDTOError[0].path).toContain("request.cuit");
-      expect((error as DTOMappingException).restDTOError[0].message).toContain("Invoice Request DTO must have either cuit or dni but not both");
-      expect((error as DTOMappingException).restDTOError[0].code).toBe("invalid");
+      expect((error as DTOMappingException).error.length).toBe(2);
+      expect((error as DTOMappingException).error[0].path).toContain("request.cuit");
+      expect((error as DTOMappingException).error[0].message).toContain("Invoice Request DTO must have either cuit or dni but not both");
+      expect((error as DTOMappingException).error[0].code).toBe("invalid");
 
-      expect((error as DTOMappingException).restDTOError[1].path).toContain("request.dni");
-      expect((error as DTOMappingException).restDTOError[1].message).toContain("Invoice Request DTO must have either cuit or dni but not both");
-      expect((error as DTOMappingException).restDTOError[1].code).toBe("invalid");
+      expect((error as DTOMappingException).error[1].path).toContain("request.dni");
+      expect((error as DTOMappingException).error[1].message).toContain("Invoice Request DTO must have either cuit or dni but not both");
+      expect((error as DTOMappingException).error[1].code).toBe("invalid");
     }
   });
 
@@ -121,22 +121,22 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(DTOMappingException);
       expect((error as DTOMappingException).message).toContain("There where errors mapping the given DTO");
-      expect((error as DTOMappingException).restDTOError.length).toBe(4);
-      expect((error as DTOMappingException).restDTOError[0].path).toContain("request.serviceFrom");
-      expect((error as DTOMappingException).restDTOError[0].message).toContain("Invoice Request DTO must have serviceFrom when concept is services");
-      expect((error as DTOMappingException).restDTOError[0].code).toBe("invalid");
+      expect((error as DTOMappingException).error.length).toBe(4);
+      expect((error as DTOMappingException).error[0].path).toContain("request.serviceFrom");
+      expect((error as DTOMappingException).error[0].message).toContain("Invoice Request DTO must have serviceFrom when concept is services");
+      expect((error as DTOMappingException).error[0].code).toBe("invalid");
 
-      expect((error as DTOMappingException).restDTOError[1].path).toContain("request.serviceTo");
-      expect((error as DTOMappingException).restDTOError[1].message).toContain("Invoice Request DTO must have serviceTo when concept is services");
-      expect((error as DTOMappingException).restDTOError[1].code).toBe("invalid");
+      expect((error as DTOMappingException).error[1].path).toContain("request.serviceTo");
+      expect((error as DTOMappingException).error[1].message).toContain("Invoice Request DTO must have serviceTo when concept is services");
+      expect((error as DTOMappingException).error[1].code).toBe("invalid");
 
-      expect((error as DTOMappingException).restDTOError[2].path).toContain("request.serviceFrom");
-      expect((error as DTOMappingException).restDTOError[2].message).toContain("Invoice Request DTO must have serviceFrom in the format YYYY-MM-DD");
-      expect((error as DTOMappingException).restDTOError[2].code).toBe("invalid");
+      expect((error as DTOMappingException).error[2].path).toContain("request.serviceFrom");
+      expect((error as DTOMappingException).error[2].message).toContain("Invoice Request DTO must have serviceFrom in the format YYYY-MM-DD");
+      expect((error as DTOMappingException).error[2].code).toBe("invalid");
 
-      expect((error as DTOMappingException).restDTOError[3].path).toContain("request.serviceTo");
-      expect((error as DTOMappingException).restDTOError[3].message).toContain("Invoice Request DTO must have serviceTo in the format YYYY-MM-DD");
-      expect((error as DTOMappingException).restDTOError[3].code).toBe("invalid");
+      expect((error as DTOMappingException).error[3].path).toContain("request.serviceTo");
+      expect((error as DTOMappingException).error[3].message).toContain("Invoice Request DTO must have serviceTo in the format YYYY-MM-DD");
+      expect((error as DTOMappingException).error[3].code).toBe("invalid");
     }
   });
 
@@ -170,10 +170,10 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(DTOMappingException);
       expect((error as DTOMappingException).message).toContain("There where errors mapping the given DTO");
-      expect((error as DTOMappingException).restDTOError.length).toBe(1);
-      expect((error as DTOMappingException).restDTOError[0].path).toContain("request.monto");
-      expect((error as DTOMappingException).restDTOError[0].message).toContain("Invoice Request DTO must have a positive amount");
-      expect((error as DTOMappingException).restDTOError[0].code).toBe("invalid");
+      expect((error as DTOMappingException).error.length).toBe(1);
+      expect((error as DTOMappingException).error[0].path).toContain("request.monto");
+      expect((error as DTOMappingException).error[0].message).toContain("Invoice Request DTO must have a positive amount");
+      expect((error as DTOMappingException).error[0].code).toBe("invalid");
     }
   });
 
@@ -188,10 +188,10 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(DTOMappingException);
       expect((error as DTOMappingException).message).toContain("There where errors mapping the given DTO");
-      expect((error as DTOMappingException).restDTOError.length).toBe(1);
-      expect((error as DTOMappingException).restDTOError[0].path).toContain("request.monto");
-      expect((error as DTOMappingException).restDTOError[0].message).toContain("Invoice Request DTO must have a positive amount");
-      expect((error as DTOMappingException).restDTOError[0].code).toBe("invalid");
+      expect((error as DTOMappingException).error.length).toBe(1);
+      expect((error as DTOMappingException).error[0].path).toContain("request.monto");
+      expect((error as DTOMappingException).error[0].message).toContain("Invoice Request DTO must have a positive amount");
+      expect((error as DTOMappingException).error[0].code).toBe("invalid");
     }
   });
 
@@ -206,10 +206,10 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(DTOMappingException);
       expect((error as DTOMappingException).message).toContain("There where errors mapping the given DTO");
-      expect((error as DTOMappingException).restDTOError.length).toBe(1);
-      expect((error as DTOMappingException).restDTOError[0].path).toContain("request.pointOfSale");
-      expect((error as DTOMappingException).restDTOError[0].message).toContain("Invoice Request DTO must have a positive pointOfSale");
-      expect((error as DTOMappingException).restDTOError[0].code).toBe("invalid");
+      expect((error as DTOMappingException).error.length).toBe(1);
+      expect((error as DTOMappingException).error[0].path).toContain("request.pointOfSale");
+      expect((error as DTOMappingException).error[0].message).toContain("Invoice Request DTO must have a positive pointOfSale");
+      expect((error as DTOMappingException).error[0].code).toBe("invalid");
     }
   });
 
@@ -224,10 +224,10 @@ describe('FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(DTOMappingException);
       expect((error as DTOMappingException).message).toContain("There where errors mapping the given DTO");
-      expect((error as DTOMappingException).restDTOError.length).toBe(1);
-      expect((error as DTOMappingException).restDTOError[0].path).toContain("request.concept");
-      expect((error as DTOMappingException).restDTOError[0].message).toContain("Invoice Request DTO must have a valid concept (products or services)");
-      expect((error as DTOMappingException).restDTOError[0].code).toBe("invalid");
+      expect((error as DTOMappingException).error.length).toBe(1);
+      expect((error as DTOMappingException).error[0].path).toContain("request.concept");
+      expect((error as DTOMappingException).error[0].message).toContain("Invoice Request DTO must have a valid concept (products or services)");
+      expect((error as DTOMappingException).error[0].code).toBe("invalid");
     }
   });
 

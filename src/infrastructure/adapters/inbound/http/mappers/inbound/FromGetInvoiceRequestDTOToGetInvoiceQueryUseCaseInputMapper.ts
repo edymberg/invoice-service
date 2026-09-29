@@ -1,4 +1,4 @@
-import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
+import { AbstractDTOValidator, DTOError } from "../../../../../../../framework/http";
 import { Mapper } from "../../../../../../../framework/mediator";
 import { GetInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/GetInvoice";
 import { GetInvoiceRequestDTO } from "../../dtos/GetInvoiceRequestDTO";
@@ -18,16 +18,16 @@ export class FromGetInvoiceRequestDTOToGetInvoiceQueryUseCaseInputMapper
   }
 
   protected doValidations(dto: GetInvoiceRequestDTO) {
-    const restDTOError: RestDTOError = [];
+    const dtoError: DTOError = [];
 
     if (!dto.id || dto.id.length === 0) {
-      restDTOError.push({
+      dtoError.push({
         path: "id",
         code: "invalid",
         message: "Get Invoice Request DTO must be a valid id",
       });
     }
 
-    return restDTOError;
+    return dtoError;
   }
 }

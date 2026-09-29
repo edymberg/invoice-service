@@ -1,4 +1,4 @@
-import { AbstractDTOValidator, RestDTOError } from "../../../../../../../framework/http";
+import { AbstractDTOValidator, DTOError } from "../../../../../../../framework/http";
 import { Mapper } from "../../../../../../../framework/mediator";
 import { IssueInvoiceUseCaseInput } from "../../../../../../domain/invoice/usecases/IssueInvoice";
 import { CONCEPT } from "../../../../../../domain/invoice/vo/Concept";
@@ -59,16 +59,16 @@ export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper
     } as IssueInvoiceUseCaseInput;
   }
 
-  protected doValidations(invoiceDTO: CreateInvoiceRequestDTO): RestDTOError {
-    const restDTOError: RestDTOError = [];
+  protected doValidations(invoiceDTO: CreateInvoiceRequestDTO): DTOError {
+    const dtoError: DTOError = [];
 
     if (!!invoiceDTO.cuit && !!invoiceDTO.dni) {
-      restDTOError.push({
+      dtoError.push({
         path: "request.cuit",
         code: "invalid",
         message: "Invoice Request DTO must have either cuit or dni but not both",
       });
-      restDTOError.push({
+      dtoError.push({
         path: "request.dni",
         code: "invalid",
         message: "Invoice Request DTO must have either cuit or dni but not both",
@@ -79,28 +79,28 @@ export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper
       (!invoiceDTO.serviceFrom || !invoiceDTO.serviceTo)
     ) {
       if (!invoiceDTO.serviceFrom) {
-        restDTOError.push({
+        dtoError.push({
           path: "request.serviceFrom",
           code: "invalid",
           message: "Invoice Request DTO must have serviceFrom when concept is services",
         });
       }
       if (!invoiceDTO.serviceTo) {
-        restDTOError.push({
+        dtoError.push({
           path: "request.serviceTo",
           code: "invalid",
           message: "Invoice Request DTO must have serviceTo when concept is services",
         });
       }
       if (invoiceDTO.serviceFrom?.split("-").length !== 3) {
-        restDTOError.push({
+        dtoError.push({
           path: "request.serviceFrom",
           code: "invalid",
           message: "Invoice Request DTO must have serviceFrom in the format YYYY-MM-DD",
         });
       }
       if (invoiceDTO.serviceTo?.split("-").length !== 3) {
-        restDTOError.push({
+        dtoError.push({
           path: "request.serviceTo",
           code: "invalid",
           message: "Invoice Request DTO must have serviceTo in the format YYYY-MM-DD",
@@ -108,27 +108,27 @@ export class FromInvoiceRequestDTOToIssueInvoiceUseCaseInputMapper
       }
     }
     if (invoiceDTO.monto <= 0) {
-      restDTOError.push({
+      dtoError.push({
         path: "request.monto",
         code: "invalid",
         message: "Invoice Request DTO must have a positive amount",
       });
     }
     if (invoiceDTO.pointOfSale <= 0) {
-      restDTOError.push({
+      dtoError.push({
         path: "request.pointOfSale",
         code: "invalid",
         message: "Invoice Request DTO must have a positive pointOfSale",
       });
     }
     if (invoiceDTO.concept !== CONCEPT.SERVICES && invoiceDTO.concept !== CONCEPT.PRODUCTS) {
-      restDTOError.push({
+      dtoError.push({
         path: "request.concept",
         code: "invalid",
         message: "Invoice Request DTO must have a valid concept (products or services)",
       });
     }
 
-    return restDTOError;
+    return dtoError;
   }
 }

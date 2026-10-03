@@ -1,6 +1,10 @@
 export { bodyMapperMiddleware, paramsMapperMiddleware } from "./middlewares/bodyMapper";
+export { correlationMiddleware } from "./middlewares/correlation";
+export { errorHandler } from "./middlewares/errorHandler";
 export type { TypedRequest } from "./types/TypedRequest";
 export type { TypedResponse } from "./types/TypedResponse";
+export type { CorrelationMiddleware } from "./types/CorrelationMiddleware";
+export type { ErrorHandlerMiddleware } from "./types/ErrorHandlerMiddleware";
 export type { DTOError } from "./DTOValidator";
 export { DTOMappingException, DTOValidator, AbstractDTOValidator } from "./DTOValidator";
 export { Swagger } from "./Swagger";

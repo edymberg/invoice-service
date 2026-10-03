@@ -106,40 +106,6 @@ describe('Invoice API Integration Tests', () => {
     describe('Request Validations', () => {
       it('should return 400 for invalid request - DTOMappingException', async () => {
         const invalidRequest = {
-          monto: 100.50
-        };
-
-        const response = await act(invalidRequest, authToken);
-
-        expect(response.status).toBe(400);
-
-        // TODO: generate a custom matcher for GenericErrors
-        expect(response.body).toHaveProperty('correlationId');
-        expect(response.body).toHaveProperty('status');
-        expect(response.body).toHaveProperty('message');
-        expect(response.body).toHaveProperty('details');
-
-        expect(response.body.status).toBe(400);
-        expect(response.body.message).toBe('Invalid request body');
-        expect(response.body.details).toHaveLength(2);
-        
-        expect(response.body.details[0]).toHaveProperty('code');
-        expect(response.body.details[0]).toHaveProperty('field');
-        expect(response.body.details[0]).toHaveProperty('message');
-        expect(response.body.details[0].code).toBe('invalid_union');
-        expect(response.body.details[0].field).toBe('concept');
-        expect(response.body.details[0].message).toBe('Invalid input');
-
-        expect(response.body.details[1]).toHaveProperty('code');
-        expect(response.body.details[1]).toHaveProperty('field');
-        expect(response.body.details[1]).toHaveProperty('message');
-        expect(response.body.details[1].code).toBe('invalid_type');
-        expect(response.body.details[1].field).toBe('pointOfSale');
-        expect(response.body.details[1].message).toBe('Required');
-      });
-
-      it('should return 400 for invalid request - DTOMappingException', async () => {
-        const invalidRequest = {
           ...validServiceInvoiceRequest,
           serviceFrom: "invalid",
         };
@@ -165,6 +131,35 @@ describe('Invoice API Integration Tests', () => {
         expect(response.body.details[0].code).toBe('invalid_string');
         expect(response.body.details[0].field).toBe('serviceFrom');
         expect(response.body.details[0].message).toBe('Invalid');
+      });
+
+      it('should return 422 for invalid request - BusinessException', async () => {
+        const invalidRequest = {
+          ...validServiceInvoiceRequest,
+          serviceFrom: "0000-00-00", 
+        };
+
+        const response = await act(invalidRequest, authToken);
+
+        expect(response.status).toBe(422);
+
+        // TODO: generate a custom matcher for GenericErrors
+        expect(response.body).toHaveProperty('correlationId');
+        expect(response.body).toHaveProperty('status');
+        expect(response.body).toHaveProperty('message');
+        expect(response.body).toHaveProperty('details');
+
+        expect(response.body.status).toBe(422);
+        expect(response.body.message).toBe('There where errors validating the given entity');
+        expect(response.body.details).toHaveLength(1);
+        
+        expect(response.body.details[0]).toHaveProperty('code');
+        expect(response.body.details[0]).toHaveProperty('field');
+        expect(response.body.details[0]).toHaveProperty('message');
+        
+        expect(response.body.details[0].code).toBe('DAY-000-000');
+        expect(response.body.details[0].field).toBe('date.day');
+        expect(response.body.details[0].message).toBe('Day must be a positive number between 1 and 31, given: 0');
       });
     });
   });

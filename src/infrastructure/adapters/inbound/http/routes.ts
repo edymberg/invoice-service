@@ -8,13 +8,13 @@ import { GetInvoiceRequestDTO } from "./dtos/GetInvoiceRequestDTO";
 import { FromHttpToGetInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToGetInvoiceRequestDTOMapper";
 import { FromHttpToInvoiceRequestDTOMapper } from "./mappers/infra/FromHttpToInvoiceRequestDTOMapper";
 import { authMiddlewareFactory } from "./middlewares/auth";
-import { correlationMiddleware } from "./middlewares/correlation";
-import { errorHandler } from "./middlewares/errorHandler";
 import {
   bodyMapperMiddleware,
   paramsMapperMiddleware,
   Swagger,
   TypedRequest,
+  CorrelationMiddleware,
+  ErrorHandlerMiddleware,
 } from "../../../../../framework/http";
 import { InvoiceServiceConfig } from "../../../config/env";
 
@@ -25,12 +25,14 @@ export function buildRouter(
     healthController: HealthController;
     salesPointsController: SalesPointsController;
     swagger: Swagger;
+    correlationMiddleware: CorrelationMiddleware;
+    errorHandler: ErrorHandlerMiddleware;
   },
   invoiceServiceConfig: InvoiceServiceConfig,
 ) {
   const router = Router();
 
-  router.use(correlationMiddleware);
+  router.use(deps.correlationMiddleware);
 
   router.get("/health", deps.healthController.health);
   router.use("/api-docs", deps.swagger.serve(), deps.swagger.setup());
@@ -75,6 +77,6 @@ export function buildRouter(
     }
   });
 
-  router.use(errorHandler);
+  router.use(deps.errorHandler);
   return router;
 }

@@ -7,6 +7,7 @@ import { Identification, DocumentType } from "../../../../src/domain/invoice/vo/
 import { VoucherType } from "../../../../src/domain/invoice/vo/VoucherType";
 import { InvoiceStatus } from "../../../../src/domain/invoice/vo/InvoiceStatus";
 import { AfipVoucherInfo } from "../../../../src/domain/invoice/vo/AfipVoucherInfo";
+import { BusinessRuleViolation } from "../../../../framework/ddd";
 
 describe('Invoice', () => {
   const anInvoiceId = (): string => "invoice-123";
@@ -108,7 +109,8 @@ describe('Invoice', () => {
     });
 
     it('Given service concept without service dates, when initializing invoice, then should throw business rule violation', () => {
-      const act = () => Invoice.builder()
+      try {
+        Invoice.builder()
         .id(anInvoiceId())
         .externalId(anExternalId())
         .status(InvoiceStatus.Draft)
@@ -119,12 +121,22 @@ describe('Invoice', () => {
         .date(aDay())
         .total(anAmount())
         .build();
-
-      expect(act).toThrow("ServiceFrom is required for Concept.SERVICES");
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(2);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("ServiceFrom is required for Concept.SERVICES");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("invoice.serviceFrom");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("CONCEPT_SERVICES-000-000");
+        expect((error as BusinessRuleViolation).error[1].message).toBe("ServiceTo is required for Concept.SERVICES");
+        expect((error as BusinessRuleViolation).error[1].path).toBe("invoice.serviceTo");
+        expect((error as BusinessRuleViolation).error[1].code).toBe("CONCEPT_SERVICES-001-000");
+      }
     });
 
     it('Given service concept with serviceFrom but without serviceTo, when initializing invoice, then should throw business rule violation', () => {
-      const act = () => Invoice.builder()
+      try {
+        Invoice.builder()
         .id(anInvoiceId())
         .externalId(anExternalId())
         .status(InvoiceStatus.Draft)
@@ -137,7 +149,14 @@ describe('Invoice', () => {
         .serviceFrom(aServiceFromDay())
         .build();
 
-      expect(act).toThrow("ServiceTo is required for Concept.SERVICES");
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("ServiceTo is required for Concept.SERVICES");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("invoice.serviceTo");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("CONCEPT_SERVICES-001-000");
+      }
     });
 
     it('Given null external ID, when initializing invoice, then should accept null external ID', () => {

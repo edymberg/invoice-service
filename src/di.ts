@@ -1,5 +1,11 @@
 import { isEnv, NodeEnvironment } from "../framework/config";
-import { Swagger } from "../framework/http";
+import {
+  Swagger,
+  ErrorHandlerMiddleware,
+  errorHandler,
+  CorrelationMiddleware,
+  correlationMiddleware,
+} from "../framework/http";
 import { PinoLoggerFactory } from "../framework/logging";
 import { MaskedDTO } from "../framework/mediator";
 import { GetAfipStatusQuery } from "./business/usecases/GetAfipStatusQuery";
@@ -38,6 +44,8 @@ export async function buildDependencies(invoiceServiceConfig: InvoiceServiceConf
   healthController: HealthController;
   salesPointsController: SalesPointsController;
   swagger: Swagger;
+  correlationMiddleware: CorrelationMiddleware;
+  errorHandler: ErrorHandlerMiddleware;
 }> {
   // Logger
   PinoLoggerFactory.configureLogger(invoiceServiceConfig);
@@ -119,5 +127,7 @@ export async function buildDependencies(invoiceServiceConfig: InvoiceServiceConf
     healthController,
     salesPointsController,
     swagger,
+    correlationMiddleware,
+    errorHandler,
   };
 }

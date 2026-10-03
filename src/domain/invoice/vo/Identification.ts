@@ -1,33 +1,49 @@
-import { BusinessRule, BusinessRuleViolation } from "../../../../framework/ddd";
-
-export class IdentificationBusinessRuleViolation extends BusinessRuleViolation {
-  constructor(message: string) {
-    super(message);
-  }
-}
+import { BusinessRule, DomainError } from "../../../../framework/ddd";
 
 class IdentificationValueBusinessRules extends BusinessRule<Identification> {
-  doValidate(identification: Identification): BusinessRuleViolation | null {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const value: any = identification.value;
+  private readonly CODE = "IDENTIFICATION";
+  private readonly MIN_LENGTH = 5;
+  private readonly MAX_LENGTH = 12;
 
-    if (value === null || value === undefined) {
-      return new IdentificationBusinessRuleViolation(`Value is required. Given: ${value}`);
+  private isEmpty(value: unknown): boolean {
+    return value === null || value === undefined || value.toString().trim() === "";
+  }
+
+  private ilegalNumber(value: unknown): boolean {
+    return !Number.isInteger(value) || Number(value) <= 0;
+  }
+
+  private outOfBoundary(value: unknown): boolean {
+    const len = String(value).length;
+    return len < this.MIN_LENGTH || len > this.MAX_LENGTH;
+  }
+
+  doValidate(identification: Identification): DomainError {
+    const domainError: DomainError = [];
+    const value: unknown = identification.value;
+
+    if (this.isEmpty(value)) {
+      domainError.push({
+        path: "identification.value",
+        code: `${this.CODE}-000-000`,
+        message: `Value is required. Given: empty string`,
+      });
     }
-    if (!Number.isInteger(value) || value <= 0) {
-      return new IdentificationBusinessRuleViolation(
-        `Invalid value: ${value === "" ? "empty string" : value}. Should be a positive integer`,
-      );
+    if (!this.isEmpty(value) && this.ilegalNumber(value)) {
+      domainError.push({
+        path: "identification.value",
+        code: `${this.CODE}-000-001`,
+        message: `Invalid value: ${value}. Should be a positive integer`,
+      });
     }
-    const len = value.toString().length;
-    const minLen = 5;
-    const maxLen = 12;
-    if (len < minLen || len > maxLen) {
-      return new IdentificationBusinessRuleViolation(
-        `Invalid value length: ${len}. Should be between ${minLen} and ${maxLen}`,
-      );
+    if (!this.isEmpty(value) && !this.ilegalNumber(value) && this.outOfBoundary(value)) {
+      domainError.push({
+        path: "identification.value",
+        code: `${this.CODE}-000-002`,
+        message: `Invalid value length: ${String(value).length}. Should be between ${this.MIN_LENGTH} and ${this.MAX_LENGTH}`,
+      });
     }
-    return null;
+    return domainError;
   }
 }
 

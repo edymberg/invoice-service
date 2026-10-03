@@ -6,23 +6,28 @@ import { InvoiceStatus } from "./vo/InvoiceStatus";
 import { Money } from "./vo/Money";
 import { PointOfSale } from "./vo/PointOfSale";
 import { VoucherType } from "./vo/VoucherType";
-import { BusinessRule, BusinessRuleViolation } from "../../../framework/ddd";
-
-export class InvoiceBusinessRuleViolation extends BusinessRuleViolation {
-  constructor(message: string) {
-    super(message);
-  }
-}
+import { BusinessRule, DomainError } from "../../../framework/ddd";
 
 class ConceptServicesBusinessRules extends BusinessRule<Invoice> {
-  doValidate(invoice: Invoice): BusinessRuleViolation | null {
+  private readonly CODE = "CONCEPT_SERVICES";
+
+  doValidate(invoice: Invoice): DomainError {
+    const domainError: DomainError = [];
     if (invoice.isServiceConcept() && !invoice.serviceFrom) {
-      return new InvoiceBusinessRuleViolation("ServiceFrom is required for Concept.SERVICES");
+      domainError.push({
+        path: "invoice.serviceFrom",
+        code: `${this.CODE}-000-000`,
+        message: "ServiceFrom is required for Concept.SERVICES",
+      });
     }
     if (invoice.isServiceConcept() && !invoice.serviceTo) {
-      return new InvoiceBusinessRuleViolation("ServiceTo is required for Concept.SERVICES");
+      domainError.push({
+        path: "invoice.serviceTo",
+        code: `${this.CODE}-001-000`,
+        message: "ServiceTo is required for Concept.SERVICES",
+      });
     }
-    return null;
+    return domainError;
   }
 }
 

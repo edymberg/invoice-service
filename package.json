@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "generate:api": "swagger-typescript-api generate -p ./schemas/openapi.yaml -o ./src/infrastructure/adapters/inbound/http/generated -n api-types.ts --no-client --type-suffix=DTO"
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 import { Identification, DocumentType } from "../../../../../src/domain/invoice/vo/Identification";
+import { BusinessRuleViolation } from "../../../../../framework/ddd";
 
 describe('Identification', () => {
   const aValidDniValue = (): number => 12345678;
@@ -45,72 +46,128 @@ describe('Identification', () => {
       const value = "12345678";
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value as unknown as number).type(type).build();
-
-      expect(act).toThrow("Invalid value: 12345678. Should be a positive integer");
+      try {
+        Identification.builder().value(value as unknown as number).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Invalid value: 12345678. Should be a positive integer");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-001");
+      }
     });
 
     it('Given null value, when creating identification, then should throw error', () => {
       const value = aNullValue();
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value as unknown as number).type(type).build();
-
-      expect(act).toThrow("Value is required. Given: null");
+      try {
+        Identification.builder().value(value as unknown as number).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Value is required. Given: empty string");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-000");
+      }
     });
 
     it('Given undefined value, when creating identification, then should throw error', () => {
       const value = anUndefinedValue();
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value as unknown as number).type(type).build();
-
-      expect(act).toThrow("Value is required. Given: undefined");
+      try{
+        Identification.builder().value(value as unknown as number).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Value is required. Given: empty string");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-000");
+      }
     });
 
     it('Given empty string value, when creating identification, then should throw error', () => {
       const value = anEmptyValue();
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value as unknown as number).type(type).build();
-
-      expect(act).toThrow("Invalid value: empty string. Should be a positive integer");
+      try {
+        Identification.builder().value(value as unknown as number).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Value is required. Given: empty string");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-000");
+      }
     });
 
     it('Given zero value, when creating identification, then should throw error', () => {
       const value = aZeroValue();
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value).type(type).build();
-
-      expect(act).toThrow("Invalid value: 0. Should be a positive integer");
+      try {
+        Identification.builder().value(value).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Invalid value: 0. Should be a positive integer");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-001");
+      }
     });
 
     it('Given negative value, when creating identification, then should throw error', () => {
       const value = aNegativeValue();
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value).type(type).build();
-
-      expect(act).toThrow("Invalid value: -12345678. Should be a positive integer");
+      try {
+        Identification.builder().value(value).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Invalid value: -12345678. Should be a positive integer");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-001");
+      }
     });
 
     it('Given short value, when creating identification, then should throw error', () => {
       const value = aShortValue();
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value).type(type).build();
-
-      expect(act).toThrow("Invalid value length: 4. Should be between 5 and 12");
+      try {
+        Identification.builder().value(value).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Invalid value length: 4. Should be between 5 and 12");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-002");
+      }
     });
 
     it('Given long value, when creating identification, then should throw error', () => {
       const value = aLongValue();
       const type = DocumentType.DNI;
 
-      const act = () => Identification.builder().value(value).type(type).build();
-
-      expect(act).toThrow("Invalid value length: 13. Should be between 5 and 12");
+      try {
+        Identification.builder().value(value).type(type).build();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessRuleViolation);
+        expect((error as BusinessRuleViolation).message).toBe("There where errors validating the given entity");
+        expect((error as BusinessRuleViolation).error.length).toBe(1);
+        expect((error as BusinessRuleViolation).error[0].message).toBe("Invalid value length: 13. Should be between 5 and 12");
+        expect((error as BusinessRuleViolation).error[0].path).toBe("identification.value");
+        expect((error as BusinessRuleViolation).error[0].code).toBe("IDENTIFICATION-000-002");
+      }
     });
   });
 });

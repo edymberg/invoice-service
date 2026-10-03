@@ -4,16 +4,12 @@ import { AfipController } from "../../../../../../src/infrastructure/adapters/in
 import { HealthController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/HealthController";
 import { InvoiceController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/InvoiceController";
 import { SalesPointsController } from "../../../../../../src/infrastructure/adapters/inbound/http/controllers/SalesPointsController";
-import { correlationMiddleware } from "../../../../../../src/infrastructure/adapters/inbound/http/middlewares/correlation";
 import { authMiddlewareFactory } from "../../../../../../src/infrastructure/adapters/inbound/http/middlewares/auth";
-import { errorHandler } from "../../../../../../src/infrastructure/adapters/inbound/http/middlewares/errorHandler";
 import { bodyMapperMiddleware, paramsMapperMiddleware, Swagger } from "../../../../../../framework/http";
 import { InvoiceServiceConfig } from "../../../../../../src/infrastructure/config/env";
 
 jest.mock("express");
-jest.mock("../../../../../../src/infrastructure/adapters/inbound/http/middlewares/correlation");
 jest.mock("../../../../../../src/infrastructure/adapters/inbound/http/middlewares/auth");
-jest.mock("../../../../../../src/infrastructure/adapters/inbound/http/middlewares/errorHandler");
 jest.mock("../../../../../../framework/http/middlewares/bodyMapper");
 jest.mock("../../../../../../framework/logging", () => ({
   PinoLoggerFactory: {
@@ -55,12 +51,18 @@ describe("buildRouter", () => {
     setup: jest.fn().mockReturnValue(jest.fn()),
   } as unknown as Swagger;
 
+  const errorHandler = jest.fn() as any;
+
+  const correlationMiddleware = jest.fn() as any;
+
   const buildDependencies = () => ({
     invoiceController: mockInvoiceController,
     afipController: mockAfipController,
     healthController: mockHealthController,
     salesPointsController: mockSalesPointsController,
     swagger: mockSwagger,
+    correlationMiddleware,
+    errorHandler,
   });
 
   beforeEach(() => {

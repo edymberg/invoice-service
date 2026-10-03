@@ -3,7 +3,7 @@ info:
   title: ARCA Invoicing API
   version: 1.0.0
   description: >
-    APIs para emitir Factura C en ARCA (ex AFIP) usando Afip SDK.
+    APIs to emit ARCA Invoices (ex AFIP) using Afip SDK.
 servers:
   - url: http://localhost:3000
 components:
@@ -13,7 +13,7 @@ components:
       scheme: bearer
   headers:
     X-Correlation-Id:
-      description: Correlation id para trazabilidad
+      description: Correlation id
       schema: { type: string }
   schemas:
     InvoiceStatus:
@@ -23,7 +23,7 @@ components:
       type: object
       required: [monto, concept, pointOfSale]
       properties:
-        externalId: { type: string, nullable: true, description: "Idempotencia" }
+        externalId: { type: string, nullable: true, description: "Idempotency key" }
         monto: { type: number, minimum: 0.01 }
         dni: { type: integer, minimum: 1000000, maximum: 99999999, nullable: true }
         cuit: { type: integer, minimum: 10000000000, maximum: 99999999999, nullable: true }
@@ -33,15 +33,15 @@ components:
         serviceFrom:
           type: string
           format: date
-          description: "Fecha desde (YYYY-MM-DD). Requerido si concept=2"
+          description: "Date from (YYYY-MM-DD). Required if concept=2"
         serviceTo:
           type: string
           format: date
-          description: "Fecha hasta (YYYY-MM-DD). Requerido si concept=2"
+          description: "Date to (YYYY-MM-DD). Required if concept=2"
         pointOfSale:
           type: integer
           minimum: 1
-          description: "Punto de venta (parametrizado)"
+          description: "Point of sale (configured)"
     CreateInvoiceResponse:
       type: object
       properties:
@@ -69,6 +69,20 @@ components:
         cae: { type: string, nullable: true }
         caeVto: { type: string, nullable: true }
         voucherNumber: { type: integer, nullable: true }
+    ErrorResponse:
+      type: object
+      properties:
+        message: { type: string }
+        status: { type: integer, nullable: true }
+        correlationId: { type: string, nullable: true }
+        details: 
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              field: { type: string }
+              message: { type: string }
 security:
   - bearerAuth: []
 paths:
@@ -80,8 +94,8 @@ paths:
 
   /invoices:
     post:
-      summary: Emitir Factura C
-      description: Emite Factura C (CbteTipo=11), IVA 0. Si no se envía DNI, se usa Consumidor Final (DocTipo=99/DocNro=0).
+      summary: Emit Incoice (Only type C for now)
+      description: Emits C Invoices (CbteTipo=11), IVA 0. If DNI is not provided, Final Consumer (DocTipo=99/DocNro=0) is used.
       security:
         - bearerAuth: []
       parameters:
@@ -96,7 +110,7 @@ paths:
             schema: { $ref: '#/components/schemas/CreateInvoiceRequest' }
             examples:
               servicio:
-                summary: "Ejemplo para servicios"
+                summary: "Services example"
                 value:
                   externalId: "service-123"
                   monto: 100.50
@@ -107,7 +121,7 @@ paths:
                   serviceTo: "2025-10-31"
                   pointOfSale: 1
               producto:
-                summary: "Ejemplo para productos"
+                summary: "Products example"
                 value:
                   externalId: "product-123"
                   monto: 100.50
@@ -119,18 +133,44 @@ paths:
                   pointOfSale: 1
       responses:
         "201":
-          description: Creada
+          description: Created
           headers:
             X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CreateInvoiceResponse' }
-        "400": { description: Error de validación }
-        "401": { description: Unauthorized }
+        "400": 
+          description: Validation error
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "401":
+          description: Unauthorized
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "422":
+          description: Business Error
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500": 
+          description: Internal server error
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
 
   /invoices/{id}:
     get:
-      summary: Obtener factura
+      summary: Get invoice
       security:
         - bearerAuth: []
       parameters:
@@ -144,12 +184,38 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GetInvoiceResponse' }
-        "404":
-          description: No encontrada
+        "400": 
+          description: Validation error
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "401":
+          description: Unauthorized
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "422":
+          description: Business Error
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500": 
+          description: Internal server error
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/X-Correlation-Id' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
 
   /afip/status:
     get:
-      summary: Estado del servidor ARCA/AFIP
+      summary: Status of ARCA/AFIP server
       security:
         - bearerAuth: []
       responses:
@@ -157,8 +223,8 @@ paths:
 
   /sales-points:
     get:
-      summary: Listar puntos de venta (stub)
-      description: TODO integrar FEParamGetPtosVenta vía SDK.
+      summary: List sales points (stub)
+      description: TODO integrate FEParamGetPtosVenta via SDK.
       security:
         - bearerAuth: []
       responses:

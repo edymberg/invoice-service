@@ -130,6 +130,7 @@ export class Day {
       this.invoiceFieldsMap.month = month;
       return this;
     }
+
     public year(year: number): DayFactoryI {
       this.invoiceFieldsMap.year = year;
       return this;

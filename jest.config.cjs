@@ -14,10 +14,23 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
   ],
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 70,
+    },
+  },
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "/src/infrastructure/adapters/inbound/http/generated/",
+    "/src/infrastructure/adapters/outbound/sdk/afip/AfipSdkElectronicBillingMockAdapter.ts",
+    "/src/infrastructure/adapters/outbound/sdk/afip/AfipSdkElectronicBillingDevAdapter.ts",
+  ],
 };

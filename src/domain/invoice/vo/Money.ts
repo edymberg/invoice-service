@@ -42,7 +42,7 @@ export class Money {
       this.fieldsMap.currency = currency;
       return this;
     }
-  }
+  };
 }
 
 interface MoneyFactoryI {

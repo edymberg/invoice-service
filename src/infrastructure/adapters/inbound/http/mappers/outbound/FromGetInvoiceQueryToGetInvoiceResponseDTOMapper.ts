@@ -10,7 +10,7 @@ export class FromGetInvoiceQueryToGetInvoiceResponseDTOMapper implements Mapper<
   GetInvoiceResponseDTO
 > {
   public map(output: GetInvoiceUseCaseOutput): GetInvoiceResponseDTO {
-    if(!output){
+    if (!output) {
       throw new Error("Output is required");
     }
     const invoice = output.invoice;

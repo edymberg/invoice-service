@@ -10,6 +10,10 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPatterns=unit",
+    "test:unit:coverage": "jest --testPathPatterns=unit --coverage",
+    "test:integration": "jest --testPathPatterns=integration",
+    "test:integration:coverage": "jest --testPathPatterns=integration --coverage",
     "generate:api": "swagger-typescript-api generate -p ./schemas/openapi.yaml -o ./src/infrastructure/adapters/inbound/http/generated -n api-types.ts --no-client --type-suffix=DTO"
   },
   "dependencies": {

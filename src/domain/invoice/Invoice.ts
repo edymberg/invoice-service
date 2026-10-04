@@ -40,6 +40,7 @@ interface InvoiceFactoryI {
   pointOfSale(pointOfSale: PointOfSale): InvoiceFactoryI;
   voucherType(voucherType: VoucherType): InvoiceFactoryI;
   concept(concept: Concept): InvoiceFactoryI;
+  conceptType(concept: CONCEPT): InvoiceFactoryI;
   idDocument(id: Identification): InvoiceFactoryI;
   date(date: Day): InvoiceFactoryI;
   total(total: Money): InvoiceFactoryI;
@@ -232,8 +233,14 @@ export class Invoice {
       return this;
     }
 
+    // TODO: remove this method when all the code is migrated to use conceptType
     concept(concept: Concept): InvoiceFactoryI {
       this.invoiceFieldsMap.concept = concept;
+      return this;
+    }
+
+    conceptType(concept: CONCEPT): InvoiceFactoryI {
+      this.invoiceFieldsMap.concept = Concept.from(concept);
       return this;
     }
 

@@ -23,8 +23,8 @@ describe('Invoice API Integration Tests', () => {
   });
 
   describe('POST /invoices', () => {
-    const act = (requestBody: any, token: string) => {
-      return request(app)
+    const act = async (requestBody: any, token: string) => {
+      return await request(app)
         .post('/invoices')
         .set('Authorization', token)
         .send(requestBody);

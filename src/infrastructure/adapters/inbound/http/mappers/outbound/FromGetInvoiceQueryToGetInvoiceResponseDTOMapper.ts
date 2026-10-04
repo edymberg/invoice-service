@@ -10,6 +10,9 @@ export class FromGetInvoiceQueryToGetInvoiceResponseDTOMapper implements Mapper<
   GetInvoiceResponseDTO
 > {
   public map(output: GetInvoiceUseCaseOutput): GetInvoiceResponseDTO {
+    if (!output) {
+      throw new Error("Output is required");
+    }
     const invoice = output.invoice;
     if (!invoice) {
       throw new Error("Invoice not found");
